@@ -25,6 +25,7 @@ function App() {
             path: "/admin",
             element: <DashboardLayout />,
             children: [
+                { index: true, element: <Home /> },
                 { path: "home", element: <Home /> },
                 { path: "employee", element: <Employee /> },
                 { path: "attendance", element: <Attendance /> },
@@ -37,6 +38,7 @@ function App() {
             path: "/employee",
             element: <DashboardLayout />,
             children: [
+                { index: true, element: <EmpHome /> },
                 { path: "home", element: <EmpHome /> },
                 { path: "attendance", element: <EmpAttendance /> },
                 { path: "leave", element: <EmpLeave /> },

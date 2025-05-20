@@ -16,7 +16,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee saveEmployee(Employee employee) {
-        return employeeRepository.save(employee);
+
+        if (employeeRepository.findByEmail(employee.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email already in use.");
+        }else{
+            return employeeRepository.save(employee);
+        }
     }
 
     @Override
@@ -48,5 +53,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public void deleteEmployee(Long id) {
         employeeRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<Employee> getEmployeeById(Long id) {
+        return employeeRepository.findById(id);
     }
 }

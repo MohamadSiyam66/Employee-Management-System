@@ -4,14 +4,10 @@ import com.ems.backend.entity.Employee;
 import com.ems.backend.repository.EmployeeRepository;
 import com.ems.backend.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
+;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/employee")
@@ -25,6 +21,11 @@ public class EmployeeController {
     @GetMapping("employees")
     public List<Employee> getAllEmployees() {
         return employeeService.getAllEmployees();
+    }
+
+    @GetMapping("employee/{id}")
+    public Optional<Employee> getEmployeeById(@PathVariable("id") Long id){
+        return employeeService.getEmployeeById(id);
     }
 
     @PostMapping("add")

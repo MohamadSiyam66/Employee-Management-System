@@ -1,6 +1,6 @@
 const Header = () => (
     <header>
-        <h1>Employee Management System</h1>
+        <h1> Rubaai - Employee Management System</h1>
     </header>
 );
 

@@ -1,0 +1,54 @@
+.attendance-container {
+  padding: 20px;
+}
+
+.attendance-container h3 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.date-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.date-filter input[type="date"] {
+  padding: 8px;
+  font-size: 14px;
+}
+
+.date-filter button {
+  padding: 8px 12px;
+  font-size: 14px;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.date-filter button:hover {
+  background-color: #0056b3;
+}
+
+.attendance-table-container {
+  overflow-x: auto;
+}
+
+.attendance-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.attendance-table th,
+.attendance-table td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+.attendance-table th {
+  background-color: #f2f2f2;
+}

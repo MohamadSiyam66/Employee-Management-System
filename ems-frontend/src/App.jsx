@@ -1,4 +1,4 @@
-import {RouterProvider, createBrowserRouter} from 'react-router-dom';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
 import DashboardLayout from "./Layout/DashboardLayout.jsx";
 import Home from "./pages/admin/Home.jsx";
@@ -14,75 +14,38 @@ import EmpLeave from "./pages/employee/EmpLeave.jsx";
 import EmpTimesheet from "./pages/employee/EmpTimesheet.jsx";
 
 function App() {
-
     const router = createBrowserRouter([
         // Login route
         {
             path: "/",
-            element: <Login/>,
+            element: <Login />,
         },
         // Admin routes
         {
             path: "/admin",
             element: <DashboardLayout />,
             children: [
-                {
-                    path: "home",
-                    element: <Home />,
-                },
-                {
-                    path: "employee",
-                    element: <Employee />,
-                },
-                {
-                    path: "attendance",
-                    element: <Attendance />,
-                },
-                {
-                    path: "leave",
-                    element: <Leave />,
-                },
-                {
-                    path: "timesheet",
-                    element: <Timesheet />,
-                },
+                { path: "home", element: <Home /> },
+                { path: "employee", element: <Employee /> },
+                { path: "attendance", element: <Attendance /> },
+                { path: "leave", element: <Leave /> },
+                { path: "timesheet", element: <Timesheet /> },
             ],
         },
         // Employee routes
         {
             path: "/employee",
             element: <DashboardLayout />,
-            indexRoute: "/employee/home",
             children: [
-                {
-                    path: "home",
-                    element: <EmpHome />,
-                },
-                {
-                    path: "employee",
-                    element: <Employee />,
-                },
-                {
-                    path: "attendance",
-                    element: <EmpAttendance />,
-                },
-                {
-                    path: "leave",
-                    element: <EmpLeave />,
-                },
-                {
-                    path: "timesheet",
-                    element: <EmpTimesheet />,
-                },
+                { path: "home", element: <EmpHome /> },
+                { path: "attendance", element: <EmpAttendance /> },
+                { path: "leave", element: <EmpLeave /> },
+                { path: "timesheet", element: <EmpTimesheet /> },
             ],
         },
-
-
     ]);
 
-    return (
-        <RouterProvider router={router} />
-    );
+    return <RouterProvider router={router} />;
 }
 
 export default App;

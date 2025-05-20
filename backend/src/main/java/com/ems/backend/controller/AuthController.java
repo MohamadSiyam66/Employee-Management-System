@@ -1,11 +1,8 @@
 package com.ems.backend.controller;
 
-import com.ems.backend.dto.LoginRequestDTO;
-import com.ems.backend.dto.LoginResponseDTO;
 import com.ems.backend.entity.Employee;
 import com.ems.backend.repository.EmployeeRepository;
 import com.ems.backend.service.AuthService;
-import com.ems.backend.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +31,7 @@ public class AuthController {
             response.put("message", "Login successful");
             response.put("id",emp.getEmpId());
             response.put("role",emp.getRole());
+            response.put("name",emp.getUsername());
             return ResponseEntity.ok(response);
         }else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid email or password"));

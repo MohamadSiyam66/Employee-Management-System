@@ -26,7 +26,9 @@ public class AttendanceServiceImpl implements AttendanceService {
                 att.getEmployee().getLname(),
                 att.getDate(),
                 att.getStatus(),
-                att.getEmployee().getDesignation()
+                att.getEmployee().getDesignation(),
+                att.getLoggedInTime(),
+                att.getLoggedOutTime()
         )).collect(Collectors.toList());
     }
 

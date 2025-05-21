@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,10 +41,21 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public Attendance saveAttendance(Attendance attendance) {
-
         if (attendance.getEmployee() == null) {
             throw new IllegalArgumentException("Employee must be specified for attendance");
-        }else
+        }
+
+        LocalDate today = LocalDate.now();
+
+        // Check if attendance already exists for today for this employee
+        Optional<Attendance> existing = attendanceRepository.findByEmployeeEmpIdAndDate(
+                attendance.getEmployee().getEmpId(), today
+        );
+
+        if (attendance.getAttId() == null && existing.isPresent()) {
+            // New record, but already exists
+            throw new RuntimeException("Attendance already marked for today.");
+        }
 
         if (attendance.getStatus() == Attendance.Status.ABSENT) {
             attendance.setLoggedInTime(null);
@@ -51,6 +64,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         return attendanceRepository.save(attendance);
     }
+
 
     /*  json for testing saveAttendance api
     {
@@ -91,6 +105,22 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         return attendanceRepository.save(existingAtt);
     }
+
+    @Override
+    public Attendance updateLogoutTime(Long empId) {
+        LocalDate today = LocalDate.now();
+
+        Attendance attendance = attendanceRepository.findByEmployeeEmpIdAndDate(Math.toIntExact(empId), today)
+                .orElseThrow(() -> new RuntimeException("No attendance found for today."));
+
+        if (attendance.getLoggedOutTime() != null) {
+            throw new RuntimeException("Logout time already recorded for today.");
+        }
+
+        attendance.setLoggedOutTime(LocalDateTime.now());
+        return attendanceRepository.save(attendance);
+    }
+
 
     @Override
     public List<Attendance> getAttendanceByDate(LocalDate date) {

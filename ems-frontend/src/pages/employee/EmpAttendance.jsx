@@ -38,43 +38,76 @@ const EmpAttendance = () => {
 
     const handleAddSubmit = async (e) => {
     e.preventDefault();
-    try {
-        const loginDate = attendance.loggedInTime.split("T")[0]; // Extract date from datetime-local input
 
-        const payload = {
+    try {
+      const loginDate = attendance.loggedInTime.split("T")[0]; // Extract date
+
+      // Check if today's attendance already exists
+      const hasTodayAttendance = records.some(
+        (rec) => rec.date === loginDate
+      );
+
+      if (hasTodayAttendance) {
+        setMessage("You have already marked attendance for today.");
+        return;
+      }
+
+      const payload = {
         employee: { empId: emp },
         ...attendance,
-        date: loginDate, 
-        };
+        date: loginDate,
+      };
 
-        await axios.post("http://localhost:8080/api/attendance/add", payload);
-        setMessage("Attendance added.");
-        setAttendance({ empId:"",date: "", status: "PRESENT", loggedInTime: "" });
-        fetchAttendance();
+      await axios.post("http://localhost:8080/api/attendance/add", payload);
+      setMessage("Attendance added.");
+      setAttendance({ empId: "", date: "", status: "PRESENT", loggedInTime: "" });
+      fetchAttendance();
     } catch (err) {
-        setMessage("Error adding attendance.");
-        console.error(err);
+      setMessage("Error adding attendance.");
+      console.error(err);
     }
-    };
+  };
+
 
 
     const handleLogoutSubmit = async (e) => {
-        e.preventDefault();
-        try {
+      e.preventDefault();
+
+      try {
+        const rec = records.find(
+          (r) => String(r.attId) === String(logoutData.attendanceId)
+        );
+
+        if (!rec) {
+          setMessage("Attendance ID not found.");
+          return;
+        }
+
+        if (rec.loggedOutTime) {
+          setMessage("Logout time already recorded for this attendance.");
+          return;
+        }
+
         await axios.put(`http://localhost:8080/api/attendance/update/${logoutData.attendanceId}`, {
-            loggedOutTime: logoutData.loggedOutTime,
+          loggedOutTime: logoutData.loggedOutTime,
         });
+
         setMessage("Logout time updated.");
         setLogoutData({ attendanceId: "", loggedOutTime: "" });
         fetchAttendance();
-        } catch (err) {
-        setMessage(err + "Error updating logout time.");
-        }
+      } catch (err) {
+        setMessage("Error updating logout time.");
+        console.error(err);
+      }
     };
 
     useEffect(() => {
         fetchAttendance();
-    }, []);
+        if (message) {
+          const timer = setTimeout(() => setMessage(""), 3000);
+          return () => clearTimeout(timer);
+        }
+    }, [message]);
 
     return (
   <div className="emp-attendance-container">

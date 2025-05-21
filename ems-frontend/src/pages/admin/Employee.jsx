@@ -2,12 +2,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../admin/styles/Employee.css";
 
-
 const Employee = () => {
     const [employees, setEmployees] = useState([]);
     const [filteredEmployees, setFilteredEmployees] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
-    const [showPopup, setShowPopup] = useState(false);
+    const [showPopup, setShowPopup] = useState(false); // default closed
     const [popupMode, setPopupMode] = useState(""); // "add", "edit", "view"
     const [formData, setFormData] = useState({
         empId: "",
@@ -21,19 +20,22 @@ const Employee = () => {
         dob: "",
         designation: ""
     });
-    const [message, setMessage] = useState("");
 
-const showMessage = (msg) => {
-    setMessage(msg);
-    setTimeout(() => {
-        setMessage("");
-    }, 3000);
-};
+    const [message, setMessage] = useState("");
+    const [error, setError] = useState("");
+
+    const showMessage = (msg) => {
+        setMessage(msg);
+        setTimeout(() => {
+            setMessage("");
+        }, 3000);
+    };
 
     useEffect(() => {
         fetchEmployees();
     }, []);
 
+// ------------------- get employees -------------
     const fetchEmployees = () => {
         axios.get("http://localhost:8080/api/employee/employees")
             .then((response) => {
@@ -58,6 +60,7 @@ const showMessage = (msg) => {
 
     const openPopup = (mode, data = null) => {
         setPopupMode(mode);
+        setError("");
         if (data) {
             setFormData(data);
             localStorage.setItem("empId", data.empId);
@@ -82,7 +85,54 @@ const showMessage = (msg) => {
         setShowPopup(false);
     };
 
+    const MIN_PASSWORD_LENGTH = 8;
+    const MIN_NAME_LENGTH = 3;
+    const PHONE_LENGTH = 10;
+
+// ------------------- form validation -------------
+    const validateEmployee = (formData, employees, isEdit = false) => {
+
+        const currentId = formData.empId;
+
+        const duplicate = (field) =>
+            employees.some(emp => emp[field] === formData[field] && (!isEdit || emp.empId !== currentId)
+        );
+        
+        if (duplicate("email")) {
+            return "Email already exists.";
+        }
+        if (duplicate("username")) {
+            return "Username already exists.";
+        }
+        if (duplicate("phone")) {
+            return "Phone number already exists.";
+        }
+        if (!/^\d+$/.test(formData.phone)) {
+            return "Phone number must contain only digits.";
+        }
+        if (employees.some(emp => emp.email === formData.email && emp.empId !== currentId)) {
+            return "Email already exists.";     
+        }
+        if (!isEdit && formData.password.length < MIN_PASSWORD_LENGTH) {
+            return `Password must be at least ${MIN_PASSWORD_LENGTH} characters long.`;
+        }
+        if (formData.fname.length < MIN_NAME_LENGTH || formData.lname.length < MIN_NAME_LENGTH) {
+            return "First name and last name must be at least 3 characters long.";
+        }
+        if (formData.phone.length < PHONE_LENGTH) {
+            return "Phone number must be at least 10 digits long.";
+        }
+        return null;
+    };
+
+// ------------------- add employee -------------
     const addEmployee = () => {
+        const errorMessage = validateEmployee(formData, employees);
+        if (errorMessage) {
+            setError(errorMessage);
+            return;
+        }
+
         axios.post("http://localhost:8080/api/employee/add", formData)
             .then(() => {
                 fetchEmployees();
@@ -92,7 +142,13 @@ const showMessage = (msg) => {
             .catch(error => console.error("Error adding employee:", error));
     };
 
+// ------------------- update employee -------------
     const updateEmployee = () => {
+        const errorMessage = validateEmployee(formData, employees, true);
+        if (errorMessage) {
+            setError(errorMessage);
+            return;
+        }
         const id = localStorage.getItem("empId");
         axios.put(`http://localhost:8080/api/employee/update/${id}`, formData)
             .then(() => {
@@ -102,7 +158,7 @@ const showMessage = (msg) => {
             })
             .catch(error => console.error("Error updating employee:", error));
     };
-
+// ------------------- delete employee -------------
     const deleteEmployee = (id) => {
     const confirmed = window.confirm("Are you sure you want to delete this employee?");
     if (confirmed) {
@@ -116,7 +172,6 @@ const showMessage = (msg) => {
         showMessage("Employee deletion cancelled.");
     }
 };
-
 
     return (
         <div className="employee-container">
@@ -162,7 +217,7 @@ const showMessage = (msg) => {
                         </tbody>
                     </table>
                 </div>
-
+{/*--------------- Popup for Add/Edit/View Employee */}
                 {showPopup && (
                     <div className="employee-form-container">
                         <form>
@@ -183,6 +238,7 @@ const showMessage = (msg) => {
                                 {popupMode === "add" && <button type="button" onClick={addEmployee}>Add</button>}
                                 {popupMode === "edit" && <button type="button" onClick={updateEmployee}>Update</button>}
                             </div>
+                            {error && <p className="error-message">{error}</p>}
                         </form>
                     </div>
                 )}

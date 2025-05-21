@@ -12,5 +12,8 @@ public interface AttendanceService {
 //    List<Attendance> getAttendance();
     Attendance saveAttendance(Attendance attendance);
     Attendance updateAttendance(Long id, Attendance attendance);
+
+    Attendance updateLogoutTime(Long empId);
+
     List<Attendance> getAttendanceByDate(LocalDate date);
 }

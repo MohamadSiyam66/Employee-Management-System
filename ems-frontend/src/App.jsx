@@ -6,7 +6,7 @@ import Employee from "./pages/admin/Employee.jsx";
 import Attendance from "./pages/admin/Attendance.jsx";
 import Leave from "./pages/admin/Leave.jsx";
 import Timesheet from "./pages/admin/Timesheet.jsx";
-import Login from "./pages/Login.jsx";
+import Login from "./pages/login/Login.jsx";
 
 import EmpHome from "./pages/employee/EmpHome.jsx";
 import EmpAttendance from "./pages/employee/EmpAttendance.jsx";

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./Attendance.css";
+import "../admin/styles/Attendance.css";
 
 const Attendance = () => {
     const [attendances, setAttendances] = useState([]);

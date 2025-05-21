@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import './Home.css';
+import '../admin/styles/Home.css';
 import axios from 'axios';
-import { Sun, Users, UserCheck, Clock, CalendarDays } from 'lucide-react';
+import { Sun, Users, UserCheck, CalendarDays } from 'lucide-react';
 
 const Home = () => {
     const [totalEmployees, setTotalEmployees] = useState(0);
@@ -70,6 +70,7 @@ return (
     </div>
     <div className="row">
         <div className="card leave-summary-card">
+            <CalendarDays className="icon" />
             <h3>Leave Status</h3>
             <div> <b>{leaveCounts.applied}</b>  Leave Applied </div>
             <div> <b>{leaveCounts.approved}</b>  Leave Approved </div>

@@ -54,7 +54,7 @@ const Attendance = () => {
                 <table className="attendance-table">
                     <thead>
                         <tr>
-                            <th>Employee ID</th> <th>Employee Name</th> <th>Date</th> <th>Status</th> <th>In Time</th> <th>Out Time</th>
+                            <th>Employee ID</th><th>Employee Name</th><th>Date</th><th>Status</th><th>In Time</th><th>Out Time</th>
                         </tr>
                     </thead>
                     <tbody>

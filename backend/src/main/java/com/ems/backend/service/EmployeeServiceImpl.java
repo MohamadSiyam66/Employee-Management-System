@@ -19,7 +19,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         if (employeeRepository.findByEmail(employee.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already in use.");
-        }else{
+        }else if (employeeRepository.findByUsername(employee.getUsername()).isPresent()){
+            throw new IllegalArgumentException("Username already in use.");
+        }else {
+            System.out.println("Employee " + employee.getUsername() + " created");
             return employeeRepository.save(employee);
         }
     }
@@ -32,6 +35,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Employee updateEmployee(Long id, Employee updateEmployee) {
         Optional<Employee> optionalEmployee = employeeRepository.findById(id);
+        if(employeeRepository.findByEmail(updateEmployee.getEmail()).isPresent()){
+            throw new IllegalArgumentException("Email already in use.");
+        }
+
         if (optionalEmployee.isPresent()) {
             Employee existingEmployee = optionalEmployee.get();
             existingEmployee.setUsername(updateEmployee.getUsername());
@@ -52,7 +59,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public void deleteEmployee(Long id) {
-        employeeRepository.deleteById(id);
+        if (employeeRepository.findById(id).isPresent()) {
+            employeeRepository.deleteById(id);
+        }else {
+            System.out.println(" Employee not found with id: " + id);
+            throw new RuntimeException("Employee not found with id: " + id);
+        }
+
     }
 
     @Override

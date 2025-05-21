@@ -36,7 +36,7 @@ function Login() {
                 alert('Invalid Credentials');
             }
         } catch (err) {
-            alert('Login failed: '+ err.message);
+            alert('Invalid email or password '+ err.message);
         }
 
     };

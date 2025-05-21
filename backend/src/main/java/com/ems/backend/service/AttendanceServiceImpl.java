@@ -42,7 +42,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         if (attendance.getEmployee() == null) {
             throw new IllegalArgumentException("Employee must be specified for attendance");
-        }
+        }else
 
         if (attendance.getStatus() == Attendance.Status.ABSENT) {
             attendance.setLoggedInTime(null);

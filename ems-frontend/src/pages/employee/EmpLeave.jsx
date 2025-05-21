@@ -3,7 +3,7 @@ import axios from "axios";
 import "../employee/styles/EmpLeave.css";
 
 const EmpLeave = () => {
-  const empId = 3;
+  const empId = localStorage.getItem("userId");
   const [leaveData, setLeaveData] = useState({
     startDate: "",
     endDate: "",
@@ -43,7 +43,7 @@ const EmpLeave = () => {
   const fetchLeaves = async () => {
     try {
       const response = await axios.get("http://localhost:8080/api/leave/leaves");
-      const empLeaves = response.data.filter((leave) => leave.employee.empId === empId);
+      const empLeaves = response.data.filter((leave) => leave.employee.empId === Number(empId));
       setLeaves(empLeaves);
     } catch (error) {
       console.error("Error fetching leaves:", error);

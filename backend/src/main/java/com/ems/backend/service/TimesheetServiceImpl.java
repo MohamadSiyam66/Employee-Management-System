@@ -24,6 +24,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         // Returning only needed data
         return timesheets.stream().map(tmsheet -> new TimesheetDTO(
                 tmsheet.getTimesheetId(),
+                tmsheet.getEmployee().getEmpId(),
                 tmsheet.getEmployee().getFname(),
                 tmsheet.getEmployee().getLname(),
                 tmsheet.getDate(),

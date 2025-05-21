@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class TimesheetDTO {
     private int timesheetId;
+    private int employeeId;
     private String fName;
     private String lName;
     private LocalDate date;

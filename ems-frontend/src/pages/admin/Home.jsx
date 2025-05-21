@@ -30,7 +30,7 @@ useEffect(() => {
     // Fetch leave data
     axios.get('http://localhost:8080/api/leave/leaves')
         .then(res => {
-        const todayLeaves = res.data.filter(item => item.date === todayDate);
+        const todayLeaves = res.data.filter(item => item.appliedAt === todayDate && item.status === 'APPROVED');
         setLeavesToday(todayLeaves);
         setLeaveCounts(prev => ({ ...prev, applied: res.data.length }));
         })
@@ -40,6 +40,7 @@ useEffect(() => {
     axios.get('http://localhost:8080/api/leave/leaves/APPROVED')
         .then(res => setLeaveCounts(prev => ({ ...prev, approved: res.data.length })))
         .catch(err => console.error(err));
+        
 
     axios.get('http://localhost:8080/api/leave/leaves/PENDING')
         .then(res => setLeaveCounts(prev => ({ ...prev, pending: res.data.length })))
@@ -65,7 +66,6 @@ return (
             <Users className="icon" />
             <h1>{totalEmployees}</h1>
             <h4>Total Employees</h4>
-            <small>+2 new employees added!</small>
         </div>
     </div>
     <div className="row">
@@ -81,7 +81,7 @@ return (
             <UserCheck className="icon" />
             <h3>Who is on Leave Today</h3>
             {leavesToday.map((leave, index) => (
-                <div key={index} className="leave-name">{leave.employeeName}</div>
+                <div key={index} className="leave-name">{leave.employee.fname}</div>
             ))}
         </div>
     </div>

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Data
 @AllArgsConstructor
@@ -12,9 +13,12 @@ import java.time.LocalDate;
 public class TimesheetDTO {
     private int timesheetId;
     private int employeeId;
-    private String fName;
-    private String lName;
     private LocalDate date;
+    private LocalTime startTime;
+    private LocalTime lunchInTime;
+    private LocalTime lunchOutTime;
+    private LocalTime outTime;
+    private LocalTime inTime;
+    private LocalTime endTime;
     private String workHours;
-    private String designation;
 }

@@ -19,18 +19,20 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     public List<TimesheetDTO> getAllTimesheet() {
-        // Getting all data
-        List<Timesheet> timesheets = timesheetRepository.findAll();
-        // Returning only needed data
-        return timesheets.stream().map(tmsheet -> new TimesheetDTO(
-                tmsheet.getTimesheetId(),
-                tmsheet.getEmployee().getEmpId(),
-                tmsheet.getEmployee().getFname(),
-                tmsheet.getEmployee().getLname(),
-                tmsheet.getDate(),
-                tmsheet.getWorkHours(),
-                tmsheet.getEmployee().getDesignation()
-        )).collect(Collectors.toList());
+        return timesheetRepository.findAll().stream()
+                .map(tmsheet -> new TimesheetDTO(
+                        tmsheet.getTimesheetId(),
+                        tmsheet.getEmployee().getEmpId(),
+                        tmsheet.getDate(),
+                        tmsheet.getStartTime(),
+                        tmsheet.getLunchInTime(),
+                        tmsheet.getLunchOutTime(),
+                        tmsheet.getOutTime(),
+                        tmsheet.getInTime(),
+                        tmsheet.getEndTime(),
+                        tmsheet.getWorkHours()
+                ))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -40,32 +42,56 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     public Timesheet updateTimesheet(Long id, Timesheet updateTimesheet) {
+
         Timesheet existingTmsheet = timesheetRepository.findById(id)
                 .orElseThrow(() -> new TimesheetNotFoundException(id));
 
         // Check null in existingTimesheet to update
-        if (existingTmsheet.getStartTime() == null && updateTimesheet.getStartTime() != null) {
-            existingTmsheet.setStartTime(updateTimesheet.getStartTime());
+        StringBuilder errorMessages = new StringBuilder();
+
+        if (updateTimesheet.getLunchOutTime() != null) {
+            if (existingTmsheet.getLunchOutTime() == null) {
+                existingTmsheet.setLunchOutTime(updateTimesheet.getLunchOutTime());
+            } else {
+                errorMessages.append("Lunch out time cannot be updated again. ");
+            }
         }
 
-        if (existingTmsheet.getLunchOutTime() == null && updateTimesheet.getLunchOutTime() != null) {
-            existingTmsheet.setLunchOutTime(updateTimesheet.getLunchOutTime());
+        if (updateTimesheet.getLunchInTime() != null) {
+            if (existingTmsheet.getLunchInTime() == null) {
+                existingTmsheet.setLunchInTime(updateTimesheet.getLunchInTime());
+            } else {
+                errorMessages.append("Lunch in time cannot be updated again. ");
+            }
         }
 
-        if (existingTmsheet.getLunchInTime() == null && updateTimesheet.getLunchInTime() != null) {
-            existingTmsheet.setLunchInTime(updateTimesheet.getLunchInTime());
+        if (updateTimesheet.getOutTime() != null) {
+            if (existingTmsheet.getOutTime() == null) {
+                existingTmsheet.setOutTime(updateTimesheet.getOutTime());
+            } else {
+                errorMessages.append("Out time cannot be updated again. ");
+            }
         }
 
-        if (existingTmsheet.getOutTime() == null && updateTimesheet.getOutTime() != null) {
-            existingTmsheet.setOutTime(updateTimesheet.getOutTime());
+        if (updateTimesheet.getInTime() != null) {
+            if (existingTmsheet.getInTime() == null) {
+                existingTmsheet.setInTime(updateTimesheet.getInTime());
+            } else {
+                errorMessages.append("In time cannot be updated again. ");
+            }
         }
 
-        if (existingTmsheet.getInTime() == null && updateTimesheet.getInTime() != null) {
-            existingTmsheet.setInTime(updateTimesheet.getInTime());
+        if (updateTimesheet.getEndTime() != null) {
+            if (existingTmsheet.getEndTime() == null) {
+                existingTmsheet.setEndTime(updateTimesheet.getEndTime());
+            } else {
+                errorMessages.append("End time cannot be updated again. ");
+            }
         }
 
-        if (existingTmsheet.getEndTime() == null && updateTimesheet.getEndTime() != null) {
-            existingTmsheet.setEndTime(updateTimesheet.getEndTime());
+        // If any error occurred, throw combined message
+        if (!errorMessages.isEmpty()) {
+            throw new RuntimeException(errorMessages.toString().trim());
         }
 
         // Calculate work hours

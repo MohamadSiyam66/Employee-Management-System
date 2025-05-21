@@ -15,10 +15,20 @@ const EmpTimesheet = () => {
         endTime: ""
     });
     const [timesheets, setTimesheets] = useState([]);
+    const [message, setMessage] = useState("");
+    const [error, setError] = useState("");
 
     useEffect(() => {
         fetchTimesheets();
-    }, []);
+        console.log(updateData.endTime);
+        if (error || message) {
+            const timer = setTimeout(() => {
+                setError("");
+                setMessage("");
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [error, message]);
 
     const fetchTimesheets = async () => {
         try {
@@ -33,25 +43,57 @@ const EmpTimesheet = () => {
     };
 
     const handleAddTimesheet = async () => {
+
+        const alreadyAdded = timesheets.some(ts => ts.date === date);
+        if (alreadyAdded) {
+            setMessage("You have already added a timesheet for today.");
+            return;
+        }
+
         try {
             await axios.post("http://localhost:8080/api/timesheet/add", {
                 employee: { empId: empId },
                 date: date,
                 startTime: startTime
             });
-            alert("Timesheet added!");
+            setMessage("Timesheet added!");
             setDate("");
             setStartTime("");
             fetchTimesheets();
         } catch (err) {
-            console.error("Error adding timesheet", err);
+            if (err.response && err.response.status === 400) {
+                setError("Timesheet for today already exists!");
+            } else {
+                console.error("Error adding timesheet", err);
+            }
         }
     };
 
     const handleUpdateTimesheet = async () => {
+        const lunchout = timesheets.some(ts => ts.date === date && ts.lunchOutTime !== null);
+        const lunch = timesheets.some(ts => ts.date === date && ts.lunchInTime !== null);
+        const outTime = timesheets.some(ts => ts.date === date && ts.outTime !== null);
+        const inTime = timesheets.some(ts => ts.date === date && ts.inTime !== null);   
+        if (lunch) {
+            setMessage("You have already added a lunchInTime for today.");
+            return;
+        }
+        if (lunchout) {
+            setMessage("You have already added a lunchOutTime for today.");
+            return;
+        }
+        if (outTime) {
+            setMessage("You have already added an outTime for today.");
+            return;
+        }
+        if (inTime) {
+            setMessage("You have already added an inTime for today.");
+            return;
+        }
+
         try {
             await axios.put(`http://localhost:8080/api/timesheet/update/${updateData.timesheetId}`, updateData);
-            alert("Timesheet updated!");
+            console.log("Timesheet updated!");
             setUpdateData({
                 timesheetId: "",
                 inTime: "",
@@ -61,8 +103,9 @@ const EmpTimesheet = () => {
                 endTime: ""
             });
             fetchTimesheets();
+            setMessage("Timesheet updated!");
         } catch (err) {
-            console.error("Error updating timesheet", err);
+            setError("Error updating timesheet", err);
         }
     };
 
@@ -73,7 +116,8 @@ const EmpTimesheet = () => {
     return (
     <div className="emp-timesheet-container">
         <h3 className="emp-timesheet-title">Employee Timesheet</h3>
-
+        {message && <p className="emp-timesheet-message">{message}</p>}
+        {error && <p className="emp-timesheet-error">{error}</p>}
         <div className="emp-timesheet-row">
             <div className="emp-timesheet-form-box">
                 <h4>Add Timesheet</h4>
@@ -120,9 +164,12 @@ const EmpTimesheet = () => {
                         <tr>
                             <th>ID</th>
                             <th>Date</th>
+                            <th>OutTime</th>
+                            <th>InTime</th>
+                            <th>LunchOut</th>
+                            <th>LunchIn</th>
+                            <th>EndTime</th>
                             <th>Work Hours</th>
-                            <th>Designation</th>
-                            <th>Name</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -131,9 +178,12 @@ const EmpTimesheet = () => {
                                 <tr key={ts.timesheetId}>
                                     <td>{ts.timesheetId}</td>
                                     <td>{ts.date}</td>
+                                    <td>{ts.outTime}</td>
+                                    <td>{ts.inTime}</td>
+                                    <td>{ts.lunchOutTime}</td>
+                                    <td>{ts.lunchInTime}</td>
+                                    <td>{ts.endTime}</td>
                                     <td>{ts.workHours}</td>
-                                    <td>{ts.designation}</td>
-                                    <td>{ts.fname} {ts.lname}</td>
                                 </tr>
                             ))
                         ) : (

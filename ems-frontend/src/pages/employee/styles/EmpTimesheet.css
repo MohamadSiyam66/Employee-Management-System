@@ -1,154 +1,163 @@
-/* EmpTimesheet.css */
 
+/* Main container styles */
 .emp-timesheet-container {
-  padding: 1rem;
-  font-family: Arial, sans-serif;
-  margin: 0 auto;
+    font-family: 'Arial', sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    color: #333;
 }
 
+/* Title styles */
 .emp-timesheet-title {
-  text-align: center;
-  margin-bottom: 1.5rem;
+    text-align: center;
+    color: #2c3e50;
+    font-size: 24px;
 }
 
-/* Container for all rows */
+/* Row layout */
 .emp-timesheet-row {
-  display: flex;
-  flex-direction: column;
-    gap: 0px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px; /* Reduced */
+    justify-content: space-between;
 }
 
-/* First and second row: forms */
-.emp-timesheet-form-row {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: nowrap;
-  justify-content: center;
+/* Form box styles - Compact */
+.emp-timesheet-form-box {
+    flex: 1;
+    min-width: 300px;
+    background: #f9f9f9;
+    padding: 15px; /* Reduced */
+    border-radius: 6px; /* Slightly reduced */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Add Timesheet row inputs in one row */
-.emp-timesheet-add-form {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: nowrap;
-  width: 100%;
-  background: #f9f9f9;
-  padding: 10px;
-  border: 1px solid #81a9ff;
-  border-radius: 6px;
-  box-sizing: border-box;
+.emp-timesheet-form-box h4 {
+    color: #3498db;
+    font-size: 16px; /* Slightly smaller */
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px; /* Reduced */
 }
 
-/* Update Timesheet row inputs in one row */
-.emp-timesheet-update-form {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  flex-wrap: nowrap;
-  width: 100%;
-  max-width: 1000px;
-  background: #f9f9f9;
-  padding: 0.8rem 1rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  box-sizing: border-box;
-}
-
-/* Labels hidden to reduce clutter - you can show if needed */
-.emp-timesheet-add-form label,
-.emp-timesheet-update-form label {
-  display: none;
-}
-
-/* Inputs style */
+/* Compact input styles */
 .emp-timesheet-input {
-  padding: 0.4rem 0.6rem;
-  font-size: 14px;
-  border: 1px solid #bbb;
-  border-radius: 4px;
-  box-sizing: border-box;
-  
+    width: 100%;
+    padding: 8px; /* Reduced */
+    margin: 5px 0 10px; /* Reduced */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 13px; /* Slightly smaller */
+    height: 36px; /* Fixed height for consistency */
 }
 
-/* Timesheet ID input is slightly wider */
-.emp-timesheet-update-form input[name="timesheetId"] {
-  min-width: 120px;
-  max-width: 180px;
+.emp-timesheet-input:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
-/* Buttons style */
+/* Compact button styles */
 .emp-timesheet-btn {
-  min-width: 100px;
-  padding: 0.5rem 1rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background-color 0.3s ease;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 12px; /* Reduced */
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px; /* Slightly smaller */
+    transition: background-color 0.3s;
+    width: 100%;
+    margin-top: 8px; /* Reduced */
+    height: 36px; /* Matches input height */
 }
 
 .emp-timesheet-btn:hover {
-  background-color: #0056b3;
+    background-color: #2980b9;
 }
 
-/* Table container */
+/* Message and error styles */
+.emp-timesheet-message {
+    color: #27ae60;
+    background-color: #e8f8f0;
+    padding: 8px; /* Reduced */
+    border-radius: 4px;
+    margin: 8px 0; /* Reduced */
+    text-align: center;
+    font-size: 13px; /* Slightly smaller */
+}
+
+.emp-timesheet-error {
+    color: #e74c3c;
+    background-color: #fdedec;
+    padding: 8px; /* Reduced */
+    border-radius: 4px;
+    margin: 8px 0; /* Reduced */
+    text-align: center;
+    font-size: 13px; /* Slightly smaller */
+}
+
+/* Table styles */
 .emp-timesheet-table-box {
-  width: 100%;
-  overflow-x: auto;
-  background: #fff;
-  border: 1px solid #ddd;
-  padding: 1rem;
-  border-radius: 6px;
-  box-sizing: border-box;
+    flex: 100%;
+    background: #f9f9f9;
+    padding: 15px; /* Reduced */
+    border-radius: 6px; /* Slightly reduced */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .emp-timesheet-table-box h4 {
-  margin-bottom: 1rem;
-  text-align: center;
+    color: #3498db;
+    font-size: 16px; /* Slightly smaller */
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px; /* Reduced */
 }
 
-/* Table style */
 .emp-timesheet-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-  min-width: 600px;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px; /* Slightly smaller */
 }
 
-.emp-timesheet-table th,
+.emp-timesheet-table th, 
 .emp-timesheet-table td {
-  border: 1px solid #ddd;
-  padding: 8px 12px;
-  text-align: left;
+    padding: 10px 12px; /* Reduced */
+    text-align: left;
+    border-bottom: 1px solid #ddd;
 }
 
 .emp-timesheet-table th {
-  background-color: #f1f1f1;
-  font-weight: 600;
+    background-color: #3498db;
+    color: white;
+    font-weight: normal;
+    font-size: 13px; /* Slightly smaller */
+}
+
+.emp-timesheet-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.emp-timesheet-table tr:hover {
+    background-color: #e6f7ff;
 }
 
 .emp-timesheet-no-data {
-  text-align: center;
-  color: #888;
-  padding: 1rem 0;
+    text-align: center;
+    color: #7f8c8d;
+    padding: 15px; /* Reduced */
+    font-size: 13px; /* Slightly smaller */
 }
 
-/* Responsive: stack forms vertically on smaller screens */
-@media (max-width: 900px) {
-  .emp-timesheet-add-form,
-  .emp-timesheet-update-form {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .emp-timesheet-input {
-    min-width: 120px;
-    max-width: 100%;
-    margin-bottom: 0.6rem;
-  }
-  .emp-timesheet-btn {
-    width: 100%;
-  }
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .emp-timesheet-row {
+        flex-direction: column;
+        gap: 10px; /* Reduced */
+    }
+    
+    .emp-timesheet-form-box {
+        min-width: 100%;
+        padding: 12px; /* Reduced */
+    }
 }

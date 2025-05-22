@@ -21,4 +21,6 @@ public class TimesheetDTO {
     private LocalTime inTime;
     private LocalTime endTime;
     private String workHours;
+    private String fname;
+    private String lname;
 }

@@ -30,7 +30,9 @@ public class TimesheetServiceImpl implements TimesheetService {
                         tmsheet.getOutTime(),
                         tmsheet.getInTime(),
                         tmsheet.getEndTime(),
-                        tmsheet.getWorkHours()
+                        tmsheet.getWorkHours(),
+                        tmsheet.getEmployee().getFname(),
+                        tmsheet.getEmployee().getLname()
                 ))
                 .collect(Collectors.toList());
     }

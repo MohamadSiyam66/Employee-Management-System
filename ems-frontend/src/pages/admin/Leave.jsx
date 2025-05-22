@@ -6,6 +6,7 @@ const Leave = () => {
     const [leaves, setLeaves] = useState([]);
     const [filteredLeaves, setFilteredLeaves] = useState([]);
     const [statusFilter, setStatusFilter] = useState("");
+    const [error, setError] = useState("");
 
     useEffect(() => {
         fetchLeaves();
@@ -19,6 +20,7 @@ const Leave = () => {
             })
             .catch((error) => {
                 console.error("Error fetching leave data:", error);
+                setError("Error fetching leave data: " + error.message);
             });
     };
 
@@ -42,6 +44,7 @@ const Leave = () => {
         })
         .catch((error) => {
             console.error("Error updating leave status:", error);
+            setError("Error updating leave status: " + error.message);
         });
     };
 
@@ -49,7 +52,7 @@ const Leave = () => {
     return (
         <div className="leave-container">
             <h3>Leave Management</h3>
-
+            {error && <p className="error-message">{error}</p>}
             <div className="leave-filter">
                 <label>Status: </label>
                 <select value={statusFilter} onChange={handleStatusChange}>

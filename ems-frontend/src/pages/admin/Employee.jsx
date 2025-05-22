@@ -43,6 +43,7 @@ const Employee = () => {
                 setFilteredEmployees(response.data);
             })
             .catch((error) => {
+                setError("Error fetching employee data: " + error.message);
                 console.error("Error fetching employee data:", error);
             });
     };
@@ -167,7 +168,10 @@ const Employee = () => {
                 fetchEmployees();
                 showMessage("Employee deleted successfully.");
             })
-            .catch(error => console.error("Error deleting employee:", error));
+            .catch(error => {
+                console.error("Error deleting employee:", error);
+                setError("Error deleting employee: " + error.message);
+            });
     } else {
         showMessage("Employee deletion cancelled.");
     }
@@ -186,6 +190,12 @@ const Employee = () => {
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                     <button onClick={handleSearch}>Search</button>
+                    {searchQuery && (
+                    <button onClick={() => {
+                        setSearchQuery("");
+                        setFilteredEmployees(employees);
+                    }}>Clear</button>
+                )}
                 </div>
                 <div className="add-employee">
                     <button onClick={() => openPopup("add")}>Add Employee</button>
@@ -238,6 +248,7 @@ const Employee = () => {
                                 {popupMode === "add" && <button type="button" onClick={addEmployee}>Add</button>}
                                 {popupMode === "edit" && <button type="button" onClick={updateEmployee}>Update</button>}
                             </div>
+                            {/* Display error message */}
                             {error && <p className="error-message">{error}</p>}
                         </form>
                     </div>

@@ -60,7 +60,7 @@ return (
             <h2>{new Date().toLocaleTimeString()}</h2>
             <p>Realtime Insight</p>
             <p><strong>Today:</strong><br />{new Date().toDateString()}</p>
-        <div className="number-box">{attendanceToday} <span>Total Attendance</span></div>
+            <div className="number-box">{attendanceToday} <span>Total Attendance</span></div>
         </div>
         <div className="card total-employee-card">
             <Users className="icon" />

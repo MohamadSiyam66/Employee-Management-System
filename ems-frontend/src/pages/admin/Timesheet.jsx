@@ -20,9 +20,8 @@ const Timesheet = () => {
             });
     };
 
-    const filteredTimesheets = selectedDate
-        ? timesheets.filter(ts => ts.date === selectedDate)
-        : timesheets;
+// ---------- Filter timesheets based on selected date --------------
+    const filteredTimesheets = selectedDate ? timesheets.filter(ts => ts.date === selectedDate) : timesheets;
 
     return (
         <div className="timesheet-container">
@@ -42,20 +41,28 @@ const Timesheet = () => {
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Employee Name</th>
                             <th>Date</th>
+                            <th>OutTime</th>
+                            <th>InTime</th>
+                            <th>LunchOut</th>
+                            <th>LunchIn</th>
+                            <th>EndTime</th>
                             <th>Work Hours</th>
-                            <th>Name</th>
-                            <th>Designation</th>
                         </tr>
                     </thead>
                     <tbody>
                         {filteredTimesheets.map((ts) => (
                             <tr key={ts.timesheetId}>
                                 <td>{ts.timesheetId}</td>
+                                <td>{ts.fname + " " + ts.lname}</td>
                                 <td>{ts.date}</td>
+                                <td>{ts.outTime}</td>
+                                <td>{ts.inTime}</td>
+                                <td>{ts.lunchOutTime}</td>
+                                <td>{ts.lunchInTime}</td>
+                                <td>{ts.endTime}</td>
                                 <td>{ts.workHours}</td>
-                                <td>{ts.fname+" "+ts.lname}</td>
-                                <td>{ts.designation}</td>
                             </tr>
                         ))}
                     </tbody>

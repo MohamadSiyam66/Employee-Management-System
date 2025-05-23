@@ -230,6 +230,7 @@ const Employee = () => {
 {/*--------------- Popup for Add/Edit/View Employee */}
                 {showPopup && (
                     <div className="employee-form-container">
+                        {message && <center className="employee-message">{message}</center>}
                         <form>
                             <input name="username" placeholder="Username" value={formData.username} onChange={handleInputChange} disabled={popupMode === "view"} />
                             {popupMode === "add" && <input name="password" type="password" placeholder="Password" value={formData.password} onChange={handleInputChange} />}

@@ -35,9 +35,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Employee updateEmployee(Long id, Employee updateEmployee) {
         Optional<Employee> optionalEmployee = employeeRepository.findById(id);
-        if(employeeRepository.findByEmail(updateEmployee.getEmail()).isPresent()){
-            throw new IllegalArgumentException("Email already in use.");
-        }
 
         if (optionalEmployee.isPresent()) {
             Employee existingEmployee = optionalEmployee.get();

@@ -34,10 +34,10 @@ Open the project using IntelliJ IDEA.
 
 ### 3. Enable Annotation Processing  
 Go to:  
-`Settings -> Build, Execution, Deployment -> Compiler -> Annotation Processors`  
-✅ Check **"Enable annotation processing"**
-`Settings -> Build, Execution, Deployment -> Compiler -> Annotation Processors -> Annotation Profile For Backend`
-✅ Check **"Enable annotation processing"** and **"Obtain Processors from project classpath** 
+- `Settings -> Build, Execution, Deployment -> Compiler -> Annotation Processors`  
+- ✅ Check **"Enable annotation processing"**
+- `Settings -> Build, Execution, Deployment -> Compiler -> Annotation Processors -> Annotation Profile For Backend`
+- ✅ Check **"Enable annotation processing"** and **"Obtain Processors from project classpath** 
 
 ### 4. Download Maven Dependencies (Intellij Idea will ask automatically)
 

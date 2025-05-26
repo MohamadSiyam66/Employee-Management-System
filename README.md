@@ -64,7 +64,7 @@ Run the backend using IntelliJ **Use Below reference image**
   - **npm install axios**
   - **npm install lucide-react**
   - **npm install react-router-dom**
-     **npm run dev**
+  - **npm run dev**
 
 
 

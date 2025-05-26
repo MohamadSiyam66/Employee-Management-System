@@ -36,17 +36,37 @@ Open the project using IntelliJ IDEA.
 Go to:  
 `Settings -> Build, Execution, Deployment -> Compiler -> Annotation Processors`  
 ✅ Check **"Enable annotation processing"**
+`Settings -> Build, Execution, Deployment -> Compiler -> Annotation Processors -> Annotation Profile For Backend`
+✅ Check **"Enable annotation processing"** and **"Obtain Processors from project classpath** 
 
-### 4. Run the Application
-Run the backend using IntelliJ
+### 4. Download Maven Dependencies (Intellij Idea will ask automatically)
+
+### 5. Open MySQL Workbench or MySql commandline 
+  - Enter your password (1234)
+  - Create Database named 'ems_rubaai_db'. if you are using mysql cmd line ->  **create database new;**
+
+### 6. Go to main/resources/application.properties
+  - set username (root)
+  - set password (1234)
+  - **use your mysql password and username by default it will be root and 1234**
+
+### 7. Run the Application
+Run the backend using IntelliJ **Use Below reference image**
+
+![image](https://github.com/user-attachments/assets/c2aef494-2fd3-4833-8da4-533f808defe2)
 
 ## ⚙️ Instructions to Run the Frontend
 
 ### 1. Clone the frontend or Download zip file
 ### 2. Open with a code editor VS Code / WebStorm
 ### 3. Open terminal and run : 
-npm install
-npm run dev
+  **npm install**
+  
+  **npm install axios
+  npm install lucide-react
+  npm install react-router-dom**
+  
+  **npm run dev**
 
 
 

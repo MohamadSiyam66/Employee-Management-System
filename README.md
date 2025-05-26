@@ -56,6 +56,12 @@ Run the backend using IntelliJ **Use Below reference image**
 
 ![image](https://github.com/user-attachments/assets/c2aef494-2fd3-4833-8da4-533f808defe2)
 
+### 8. After runnning the application all the tables are created in the database.
+- run this query in the mysql commandline or insert using MySQL Workbench:
+- INSERT INTO employee (username, password, role, fname, lname, email, phone, dob, designation) VALUES ('admin', 'admin123', 'ADMIN', 'Admin', 'User', 'admin@example.com', '1234567890', '1990-01-01', 'System Administrator');
+- **USE THIS E-MAIL AND PASSWORD FOR LOGIN**
+
+
 ## ⚙️ Instructions to Run the Frontend
 
 ### 1. Clone the frontend or Download zip file

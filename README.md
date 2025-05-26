@@ -58,6 +58,7 @@ Run the backend using IntelliJ **Use Below reference image**
 
 ### 8. After runnning the application all the tables are created in the database.
 - run this query in the mysql commandline or insert using MySQL Workbench:
+- type: **use database ems_rubaai_db;**
 - INSERT INTO employee (username, password, role, fname, lname, email, phone, dob, designation) VALUES ('admin', 'admin123', 'ADMIN', 'Admin', 'User', 'admin@example.com', '1234567890', '1990-01-01', 'System Administrator');
 - **USE THIS E-MAIL AND PASSWORD FOR LOGIN**
 

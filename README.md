@@ -43,7 +43,8 @@ Go to:
 
 ### 5. Open MySQL Workbench or MySql commandline 
   - Enter your password (1234)
-  - Create Database named 'ems_rubaai_db'. if you are using mysql cmd line ->  **create database new;**
+  - Create Database named 'ems_rubaai_db'.
+  - if you are using mysql cmd line, then run ->  **create database ems_rubaai_db;**
 
 ### 6. Go to main/resources/application.properties
   - set username (root)

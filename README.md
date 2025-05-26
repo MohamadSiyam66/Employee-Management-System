@@ -60,11 +60,11 @@ Run the backend using IntelliJ **Use Below reference image**
 ### 1. Clone the frontend or Download zip file
 ### 2. Open with a code editor VS Code / WebStorm
 ### 3. Open terminal and run : 
-  **npm install**
-  **npm install axios**
-  **npm install lucide-react**
-  **npm install react-router-dom**
-  **npm run dev**
+  - **npm install**
+  - **npm install axios**
+  - **npm install lucide-react**
+  - **npm install react-router-dom**
+     **npm run dev**
 
 
 

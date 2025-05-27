@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../employee/styles/EmpHome.css';
+import BASE_URL from '../../api';
 
 const EmpHome = () => {
     const emp = localStorage.getItem('userId');
@@ -21,7 +22,7 @@ const EmpHome = () => {
     }, []);
 
     const fetchEmployee = () => {
-        axios.get(`http://localhost:8080/api/employee/employee/${emp}`)
+        axios.get(`${BASE_URL}/api/employee/employee/${emp}`)
             .then(res => {
                 setEmployee(res.data);
                 setFormData({
@@ -35,7 +36,7 @@ const EmpHome = () => {
 
     const fetchLeaves = async () => {
         try {
-            const response = await axios.get("http://localhost:8080/api/leave/leaves");
+            const response = await axios.get(`${BASE_URL}/api/leave/leaves`);
             const empLeaves = response.data.filter((leave) => leave.employee.empId === emp);
             setLeaves(empLeaves);
         } catch (error) {

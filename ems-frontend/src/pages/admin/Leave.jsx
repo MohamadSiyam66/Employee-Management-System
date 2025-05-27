@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../admin/styles/Leave.css";
+import BASE_URL from "../../api";
 
 const Leave = () => {
     const [leaves, setLeaves] = useState([]);
@@ -13,7 +14,7 @@ const Leave = () => {
     }, []);
 
     const fetchLeaves = () => {
-        axios.get("http://localhost:8080/api/leave/leaves")
+        axios.get(`${BASE_URL}/api/leave/leaves`)
             .then((response) => {
                 setLeaves(response.data);
                 setFilteredLeaves(response.data);
@@ -36,7 +37,7 @@ const Leave = () => {
     };
 
     const updateLeaveStatus = (leaveId, newStatus) => {
-        axios.put(`http://localhost:8080/api/leave/update/${leaveId}`, {
+        axios.put(`${BASE_URL}/api/leave/update/${leaveId}`, {
             status: newStatus.toUpperCase()
         })
         .then(() => {

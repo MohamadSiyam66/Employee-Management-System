@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../employee/styles/EmpAttendance.css';
 import axios from 'axios';
+import BASE_URL from '../../api';
 
 const EmpAttendance = () => {
     const emp = localStorage.getItem("userId");
@@ -26,7 +27,7 @@ const EmpAttendance = () => {
 
     const fetchAttendance = async () => {
         try {
-            const res = await axios.get("http://localhost:8080/api/attendance/attendances");
+            const res = await axios.get(`${BASE_URL}/api/attendance/attendances`);
             const emp = localStorage.getItem("userId");
             const filtered = res.data.filter((att) => String(att.empId) === String(emp));
             console.log(filtered);
@@ -58,7 +59,7 @@ const EmpAttendance = () => {
         date: loginDate,
       };
 
-      await axios.post("http://localhost:8080/api/attendance/add", payload);
+      await axios.post(`${BASE_URL}/api/attendance/add`, payload);
       setMessage("Attendance added.");
       setAttendance({ empId: "", date: "", status: "PRESENT", loggedInTime: "" });
       fetchAttendance();
@@ -88,7 +89,7 @@ const EmpAttendance = () => {
           return;
         }
 
-        await axios.put(`http://localhost:8080/api/attendance/update/${logoutData.attendanceId}`, {
+        await axios.put(`${BASE_URL}/api/attendance/update/${logoutData.attendanceId}`, {
           loggedOutTime: logoutData.loggedOutTime,
         });
 

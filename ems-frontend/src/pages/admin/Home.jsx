@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import '../admin/styles/Home.css';
 import axios from 'axios';
 import { Sun, Users, UserCheck, CalendarDays } from 'lucide-react';
+import BASE_URL from '../../api';
 
 const Home = () => {
     const [totalEmployees, setTotalEmployees] = useState(0);
@@ -18,17 +19,17 @@ const Home = () => {
 
 useEffect(() => {
     // Fetch total employees
-    axios.get('http://localhost:8080/api/employee/employees')
+    axios.get(`${BASE_URL}/api/employee/employees`)
         .then(res => setTotalEmployees(res.data.length))
         .catch(err => console.error(err));
     
     // Fetch attendance data
-    axios.get(`http://localhost:8080/api/attendance/attendances/${todayDate}`)
+    axios.get(`${BASE_URL}/api/attendance/attendances/${todayDate}`)
         .then(res => setAttendanceToday(res.data.length))
         .catch(err => console.error(err));
 
     // Fetch leave data
-    axios.get('http://localhost:8080/api/leave/leaves')
+    axios.get(`${BASE_URL}/api/leave/leaves`)
         .then(res => {
         const todayLeaves = res.data.filter(item => item.appliedAt === todayDate && item.status === 'APPROVED');
         setLeavesToday(todayLeaves);
@@ -37,16 +38,16 @@ useEffect(() => {
         .catch(err => console.error(err));
     
     // Fetch leave Status data
-    axios.get('http://localhost:8080/api/leave/leaves/APPROVED')
+    axios.get(`${BASE_URL}/api/leave/leaves/APPROVED`)
         .then(res => setLeaveCounts(prev => ({ ...prev, approved: res.data.length })))
         .catch(err => console.error(err));
         
 
-    axios.get('http://localhost:8080/api/leave/leaves/PENDING')
+    axios.get(`${BASE_URL}/api/leave/leaves/PENDING`)
         .then(res => setLeaveCounts(prev => ({ ...prev, pending: res.data.length })))
         .catch(err => console.error(err));
 
-    axios.get('http://localhost:8080/api/leave/leaves/REJECTED')
+    axios.get(`${BASE_URL}/api/leave/leaves/REJECTED`)
         .then(res => setLeaveCounts(prev => ({ ...prev, rejected: res.data.length })))
         .catch(err => console.error(err));
 

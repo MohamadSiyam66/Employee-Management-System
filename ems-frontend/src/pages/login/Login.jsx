@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'
 import './Login.css';
+import BASE_URL from './../../api';
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ function Login() {
     const [error, setError] = useState('');
 
     useEffect(() => {
+        // console.log("BASE_URL:", import.meta.env.VITE_BASE_URL);
         if (error) {
             const timer = setTimeout(() => {
                 // setError(null);
@@ -43,7 +45,7 @@ function Login() {
         }
 
         try{
-            const res = await axios.post('http://localhost:8080/api/auth/login', loginDetails, {
+            const res = await axios.post(`${BASE_URL}/api/auth/login`, loginDetails, {
                 headers: {
                     'Content-Type': 'application/json'
                 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../admin/styles/Timesheet.css";
+import BASE_URL from "../../api";
 
 const Timesheet = () => {
     const [timesheets, setTimesheets] = useState([]);
@@ -11,7 +12,7 @@ const Timesheet = () => {
     }, []);
 
     const fetchTimesheets = () => {
-        axios.get("http://localhost:8080/api/timesheet/timesheets")
+        axios.get(`${BASE_URL}/api/timesheet/timesheets`)
             .then((response) => {
                 setTimesheets(response.data);
             })

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../admin/styles/Employee.css";
+import BASE_URL from "./../../api.js";
 
 const Employee = () => {
+
     const [employees, setEmployees] = useState([]);
     const [filteredEmployees, setFilteredEmployees] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
@@ -37,7 +39,7 @@ const Employee = () => {
 
 // ------------------- get employees -------------
     const fetchEmployees = () => {
-        axios.get("http://localhost:8080/api/employee/employees")
+        axios.get(`${BASE_URL}/api/employee/employees`)
             .then((response) => {
                 setEmployees(response.data);
                 setFilteredEmployees(response.data);
@@ -134,7 +136,7 @@ const Employee = () => {
             return;
         }
 
-        axios.post("http://localhost:8080/api/employee/add", formData)
+        axios.post(`${BASE_URL}/api/employee/add`, formData)
             .then(() => {
                 fetchEmployees();
                 closePopup();
@@ -151,7 +153,7 @@ const Employee = () => {
             return;
         }
         const id = localStorage.getItem("empId");
-        axios.put(`http://localhost:8080/api/employee/update/${id}`, formData)
+        axios.put(`${BASE_URL}/api/employee/update/${id}`, formData)
             .then(() => {
                 fetchEmployees();
                 closePopup();
@@ -163,7 +165,7 @@ const Employee = () => {
     const deleteEmployee = (id) => {
     const confirmed = window.confirm("Are you sure you want to delete this employee?");
     if (confirmed) {
-        axios.delete(`http://localhost:8080/api/employee/delete/${id}`)
+        axios.delete(`${BASE_URL}/api/employee/delete/${id}`)
             .then(() => {
                 fetchEmployees();
                 showMessage("Employee deleted successfully.");

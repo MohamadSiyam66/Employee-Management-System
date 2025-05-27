@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../employee/styles/EmpTimesheet.css";
+import BASE_URL from "../../api";
 
 const EmpTimesheet = () => {
     const empId = localStorage.getItem("userId");
@@ -32,7 +33,7 @@ const EmpTimesheet = () => {
 
     const fetchTimesheets = async () => {
         try {
-            const res = await axios.get("http://localhost:8080/api/timesheet/timesheets");
+            const res = await axios.get(`${BASE_URL}/api/timesheet/timesheets`);
             // console.log(res.data); // working
             const filtered = res.data.filter(ts => String(ts.employeeId) == String(empId));
             console.log(filtered); // not working
@@ -51,7 +52,7 @@ const EmpTimesheet = () => {
         }
 
         try {
-            await axios.post("http://localhost:8080/api/timesheet/add", {
+            await axios.post(`${BASE_URL}/api/timesheet/add`, {
                 employee: { empId: empId },
                 date: date,
                 startTime: startTime
@@ -92,7 +93,7 @@ const EmpTimesheet = () => {
         }
 
         try {
-            await axios.put(`http://localhost:8080/api/timesheet/update/${updateData.timesheetId}`, updateData);
+            await axios.put(`${BASE_URL}/api/timesheet/update/${updateData.timesheetId}`, updateData);
             console.log("Timesheet updated!");
             setUpdateData({
                 timesheetId: "",

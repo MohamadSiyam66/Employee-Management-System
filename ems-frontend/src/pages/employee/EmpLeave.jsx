@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../employee/styles/EmpLeave.css";
+import BASE_URL from "../../api";
 
 const EmpLeave = () => {
   const empId = localStorage.getItem("userId");
@@ -25,7 +26,7 @@ const EmpLeave = () => {
     };
 
     try {
-      await axios.post("http://localhost:8080/api/leave/add", payload);
+      await axios.post(`${BASE_URL}/api/leave/add`, payload);
       setMessage("Leave applied successfully!");
       setLeaveData({
         startDate: "",
@@ -42,7 +43,7 @@ const EmpLeave = () => {
 
   const fetchLeaves = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/leave/leaves");
+      const response = await axios.get(`${BASE_URL}/api/leave/leaves`);
       const empLeaves = response.data.filter((leave) => leave.employee.empId === Number(empId));
       setLeaves(empLeaves);
     } catch (error) {

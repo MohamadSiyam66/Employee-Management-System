@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../admin/styles/Attendance.css";
+import BASE_URL from "./../../api.js";
 
 const Attendance = () => {
     const [attendances, setAttendances] = useState([]);
@@ -12,7 +13,7 @@ const Attendance = () => {
     }, []);
 
     const fetchAttendances = () => {
-        axios.get("http://localhost:8080/api/attendance/attendances")
+        axios.get(`${BASE_URL}/api/attendance/attendances`)
             .then((response) => {
                 setAttendances(response.data);
                 setFiltered(response.data);

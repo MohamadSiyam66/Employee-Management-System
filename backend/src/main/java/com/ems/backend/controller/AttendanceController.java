@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/attendance")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:5173","https://ems-rubaai.web.app"}, allowCredentials = "true")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class AttendanceController {
 
     private  final AttendanceService attendanceService;

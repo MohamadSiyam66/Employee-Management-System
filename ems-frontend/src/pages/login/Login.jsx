@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'
+import './Login.css';
 import BASE_URL from './../../api';
 
 function Login() {
@@ -69,61 +70,24 @@ function Login() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-                <h1 className="text-3xl font-bold text-center text-cyan-700 mb-6">Login</h1>
+        <div className="login-container">
+            <h1>Login</h1>
+            <form onSubmit={handleSubmit}>
+                <div className="input-group">
+                    <label htmlFor="email">Email</label>
+                    <input type="email" id='email' name='email' placeholder="Email" value={email} onChange={e => setEmail(e.target.value)}  />
                 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Email Field */}
-                    <div>
-                        <label htmlFor="email" className="block text-gray-700 font-semibold mb-2">Email</label>
-                        <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        placeholder="Enter your email"
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-cyan-500 shadow-sm"
-                        required
-                        />
-                    </div>
-
-                    {/* Password Field */}
-                    <div>
-                        <label htmlFor="password" className="block text-gray-700 font-semibold mb-2">Password</label>
-                        <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Enter your password"
-                        value={password}
-                        onChange={e => setPassword(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-cyan-500 shadow-sm"
-                        required
-                        />
-                    </div>
-
-                    {/* Submit Button */}
-                    <div className="text-center">
-                        <button
-                        type="submit"
-                        className="bg-cyan-600 text-white px-6 py-2 rounded hover:bg-cyan-700 transition duration-200 shadow-md"
-                        >
-                        Login
-                        </button>
-                    </div>
-
-                    {/* Error Message */}
-                    {error && (
-                        <p className="text-red-500 text-sm font-medium text-center">
-                        {error}
-                        </p>
-                    )}
-                </form>
-            </div>
+                </div>
+                <div className="input-group">
+                    <label htmlFor="password">Password</label>
+                    <input type="password" id='password' name='password' placeholder="Password" value={password} onChange={e => setPassword(e.target.value)}  />
+                </div>
+                <center>
+                    <button type="submit">Login</button>
+                </center>
+                {error && <p className="error-message">{error}</p>}
+            </form>
         </div>
-
     );
 }
 

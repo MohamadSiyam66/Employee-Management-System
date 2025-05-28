@@ -1,0 +1,83 @@
+.admin-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  background-color: #f9fafc;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Row styling */
+.row {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* Card styling */
+.card {
+  flex: 1;
+  background-color: #eaf9ff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: relative;
+  border-color: #444;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.icon {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  color: #1e88e5;
+}
+
+/* Specific Cards */
+.clock-card h2,
+.clock-card p {
+  margin: 8px 0;
+}
+
+.number-box {
+  margin-top: 10px;
+  font-size: 1.5rem;
+  color: #1e88e5;
+}
+
+.total-employee-card h1 {
+  font-size: 2.5rem;
+  color: #1e88e5;
+}
+
+.leave-summary-card > div {
+  margin: 8px 0;
+  font-size: 1.1rem;
+  color: #444;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+.leave-summary-card span,
+.leave-today-card span {
+  font-size: 0.9rem;
+  display: block;
+  color: #888;
+}
+
+.leave-today-card .leave-name {
+  background-color: #e3f2fd;
+  padding: 6px 10px;
+  margin: 5px 0;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+@media screen and (max-width: 768px) {
+  .row {
+    flex-direction: column;
+  }
+}

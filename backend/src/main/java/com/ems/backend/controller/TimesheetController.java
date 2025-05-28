@@ -11,7 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/timesheet")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173","https://ems-rubaai.web.app"}, allowCredentials = "true")
 public class TimesheetController {
 
     private final TimesheetService timesheetService;

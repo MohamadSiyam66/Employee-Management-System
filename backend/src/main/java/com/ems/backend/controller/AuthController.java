@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("api/auth")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173","https://ems-rubaai.web.app"}, allowCredentials = "true")
 @RequiredArgsConstructor
 public class AuthController {
 

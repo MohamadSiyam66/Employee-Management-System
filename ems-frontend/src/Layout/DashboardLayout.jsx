@@ -3,11 +3,11 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 
 const DashboardLayout = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
+    <div>
         <Header />
-        <div style={{ display: 'flex', flex: 1 }}>
+        <div>
             <Sidebar />
-            <main style={{ flex: 1, padding: '20px', overflowY: 'auto' }}>
+            <main className='p-2'>
                 <Outlet />
             </main>
         </div>

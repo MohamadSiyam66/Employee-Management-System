@@ -5,13 +5,12 @@ import com.ems.backend.repository.EmployeeRepository;
 import com.ems.backend.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/employee")
-@CrossOrigin
+@CrossOrigin(origins = {"http://localhost:5173","https://ems-rubaai.web.app"}, allowCredentials = "true")
 @RequiredArgsConstructor
 public class EmployeeController {
 

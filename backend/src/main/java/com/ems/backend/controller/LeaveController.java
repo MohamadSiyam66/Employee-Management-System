@@ -10,7 +10,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/leave")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173","https://ems-rubaai.web.app"}, allowCredentials = "true")
 public class LeaveController {
 
     private final LeaveService leaveService;

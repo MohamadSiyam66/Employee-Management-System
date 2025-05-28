@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "../admin/styles/Leave.css";
 import BASE_URL from "../../api";
 
 const Leave = () => {
@@ -11,6 +10,7 @@ const Leave = () => {
 
     useEffect(() => {
         fetchLeaves();
+        
     }, []);
 
     const fetchLeaves = () => {
@@ -51,55 +51,84 @@ const Leave = () => {
 
 
     return (
-        <div className="leave-container">
-            <h3>Leave Management</h3>
-            {error && <p className="error-message">{error}</p>}
-            <div className="leave-filter">
-                <label>Status: </label>
-                <select value={statusFilter} onChange={handleStatusChange}>
-                    <option value="">All</option>
-                    <option value="PENDING">Pending</option>
-                    <option value="APPROVED">Approved</option>
-                    <option value="REJECTED">Rejected</option>
-                </select>
-            </div>
+        <div className="max-w-7xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+        <h3 className="text-2xl font-bold text-indigo-700 mb-4 text-center">Leave Management</h3>
 
-            <table className="leave-table">
-                <thead>
-                    <tr>
-                        <th>Employee Name</th>
-                        <th>From</th>
-                        <th>To</th>
-                        <th>Days</th>
-                        <th>Leave Type</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {filteredLeaves.map((leave) => (
-                        <tr key={leave.leaveId}>
-                            <td>{leave.employee.fname} {leave.employee.lname}</td>
-                            <td>{leave.startDate}</td>
-                            <td>{leave.endDate}</td>
-                            <td>{leave.days}</td>
-                            <td>{leave.leaveType}</td>
-                            <td>{leave.status}</td>
-                            <td>
-                                {leave.status === "PENDING" ? (
-                                    <>
-                                        <button onClick={() => updateLeaveStatus(leave.leaveId, "APPROVED")}>Approve</button>
-                                        <button onClick={() => updateLeaveStatus(leave.leaveId, "REJECTED")}>Reject</button>
-                                    </>
-                                ) : (
-                                    "-"
-                                )}
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
+        {error && <p className="text-red-600 font-semibold mb-4 text-center">{error}</p>}
+
+        {/* Filter */}
+        <div className="flex items-center gap-4 mb-6">
+            <label className="text-gray-700 font-medium">Status:</label>
+            <select
+            value={statusFilter}
+            onChange={handleStatusChange}
+            className="border border-gray-300 px-3 py-2 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+            <option value="">All</option>
+            <option value="PENDING">Pending</option>
+            <option value="APPROVED">Approved</option>
+            <option value="REJECTED">Rejected</option>
+            </select>
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+            <table className="min-w-full text-sm text-left border border-gray-300 shadow-sm rounded overflow-hidden">
+            <thead className="bg-cyan-600 text-white sticky top-0 z-10">
+                <tr>
+                <th className="px-4 py-2">Employee Name</th>
+                <th className="px-4 py-2">From</th>
+                <th className="px-4 py-2">To</th>
+                <th className="px-4 py-2">Days</th>
+                <th className="px-4 py-2">Leave Type</th>
+                <th className="px-4 py-2">Status</th>
+                <th className="px-4 py-2">Action</th>
+                </tr>
+            </thead>
+            <tbody className="bg-white text-gray-700">
+                {filteredLeaves.map((leave) => (
+                <tr key={leave.leaveId} className="border-t hover:bg-gray-50">
+                    <td className="px-4 py-2">{leave.employee.fname} {leave.employee.lname}</td>
+                    <td className="px-4 py-2">{leave.startDate}</td>
+                    <td className="px-4 py-2">{leave.endDate}</td>
+                    <td className="px-4 py-2">{leave.days}</td>
+                    <td className="px-4 py-2">{leave.leaveType}</td>
+                    <td className="px-4 py-2 font-semibold">
+                    <span className={
+                        leave.status === "APPROVED" ? "text-green-600" :
+                        leave.status === "REJECTED" ? "text-red-600" :
+                        "text-yellow-600"
+                    }>
+                        {leave.status}
+                    </span>
+                    </td>
+                    <td className="px-4 py-2">
+                    {leave.status === "PENDING" ? (
+                        <div className="flex gap-2">
+                        <button
+                            onClick={() => updateLeaveStatus(leave.leaveId, "APPROVED")}
+                            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition"
+                        >
+                            Approve
+                        </button>
+                        <button
+                            onClick={() => updateLeaveStatus(leave.leaveId, "REJECTED")}
+                            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+                        >
+                            Reject
+                        </button>
+                        </div>
+                    ) : (
+                        <span className="text-gray-400">-</span>
+                    )}
+                    </td>
+                </tr>
+                ))}
+            </tbody>
             </table>
         </div>
+        </div>
+
     );
 };
 

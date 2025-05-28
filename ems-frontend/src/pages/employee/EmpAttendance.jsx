@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import '../employee/styles/EmpAttendance.css';
 import axios from 'axios';
 import BASE_URL from '../../api';
 
@@ -111,64 +110,117 @@ const EmpAttendance = () => {
     }, [message]);
 
     return (
-  <div className="emp-attendance-container">
-    <div className="emp-attendance-forms-row">
-      <div className="emp-attendance-form-box">
-        <h3>Mark Attendance</h3>
-        <form className="emp-attendance-form" onSubmit={handleAddSubmit}>
-          <label>Status:</label>
-          <select name="status" value={attendance.status} onChange={handleAddChange}>
-            <option value="PRESENT">PRESENT</option>
-            <option value="ABSENT">ABSENT</option>
-          </select>
+      <div className="max-w-7xl mx-auto p-2 bg-white shadow-lg rounded-lg">
+      <div className="flex flex-col md:flex-row gap-6 mb-6">
+        {/* Add Attendance Form */}
+        <div className="flex-1 bg-green-50 p-4 rounded-lg shadow-md">
+          <h3 className="text-xl font-semibold mb-4 text-green-700">Mark Attendance</h3>
+          <form className="flex flex-col gap-4" onSubmit={handleAddSubmit}>
+            <div>
+              <label className="block font-medium text-gray-700 mb-1">Status:</label>
+              <select
+                name="status"
+                value={attendance.status}
+                onChange={handleAddChange}
+                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-400"
+              >
+                <option value="PRESENT">PRESENT</option>
+                <option value="ABSENT">ABSENT</option>
+              </select>
+            </div>
 
-          <label>Login Time:</label>
-          <input type="datetime-local" name="loggedInTime" value={attendance.loggedInTime} onChange={handleAddChange} required />
+            <div>
+              <label className="block font-medium text-gray-700 mb-1">Login Time:</label>
+              <input
+                type="datetime-local"
+                name="loggedInTime"
+                value={attendance.loggedInTime}
+                onChange={handleAddChange}
+                required
+                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-400"
+              />
+            </div>
 
-          <button type="submit">Add</button>
-        </form>
+            <button
+              type="submit"
+              className="bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
+            >
+              Add
+            </button>
+          </form>
+        </div>
+
+        {/* Update Logout Form */}
+        <div className="flex-1 bg-blue-50 p-4 rounded-lg shadow-md">
+          <h4 className="text-xl font-semibold mb-4 text-blue-700">Update Logout</h4>
+          <form className="flex flex-col gap-4" onSubmit={handleLogoutSubmit}>
+            <div>
+              <label className="block font-medium text-gray-700 mb-1">Attendance ID:</label>
+              <input
+                type="text"
+                name="attendanceId"
+                value={logoutData.attendanceId}
+                onChange={handleLogoutChange}
+                required
+                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-400"
+              />
+            </div>
+
+            <div>
+              <label className="block font-medium text-gray-700 mb-1">Logout Time:</label>
+              <input
+                type="datetime-local"
+                name="loggedOutTime"
+                value={logoutData.loggedOutTime}
+                onChange={handleLogoutChange}
+                required
+                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-400"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+            >
+              Update Logout
+            </button>
+          </form>
+        </div>
       </div>
 
-      <div className="emp-attendance-form-box">
-        <h4>Update Logout</h4>
-        <form className="emp-attendance-form" onSubmit={handleLogoutSubmit}>
-          <label>Attendance ID:</label>
-          <input type="text" name="attendanceId" value={logoutData.attendanceId} onChange={handleLogoutChange} required />
+      {/* Message */}
+      {message && (
+        <p className="text-center text-sm text-gray-600 font-medium mb-4">{message}</p>
+      )}
 
-          <label>Logout Time:</label>
-          <input type="datetime-local" name="loggedOutTime" value={logoutData.loggedOutTime} onChange={handleLogoutChange} required />
-
-          <button type="submit">Update Logout</button>
-        </form>
+      {/* Attendance Records Table */}
+      <div className="bg-gray-50 p-4 rounded-lg shadow-inner">
+        <h3 className="text-lg font-semibold text-gray-800 mb-3">Attendance Records</h3>
+        <div className="overflow-x-auto bg-white shadow rounded-lg max-h-[400px] overflow-y-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-cyan-600 text-white sticky top-0">
+              <tr>
+                <th className="p-3 border">ID</th>
+                <th className="p-3 border">Status</th>
+                <th className="p-3 border">Login</th>
+                <th className="p-3 border">Logout</th>
+              </tr>
+            </thead>
+            <tbody className='bg-white divide-y divide-gray-200'>
+              {records.map((rec, idx) => (
+                <tr key={idx} className="hover:bg-gray-50">
+                  <td className="px-4 py-2 whitespace-nowrap">{rec.attId}</td>
+                  <td className="px-4 py-2 whitespace-nowrap">{rec.status}</td>
+                  <td className="px-4 py-2 whitespace-nowrap">{rec.loggedInTime}</td>
+                  <td className="px-4 py-2 whitespace-nowrap">{rec.loggedOutTime || "-"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    {message && <p className="emp-attendance-message">{message}</p>}
-
-    <div className="emp-attendance-table-wrapper">
-      <h3>Attendance Records</h3>
-      <table className="emp-attendance-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Status</th>
-            <th>Login</th>
-            <th>Logout</th>
-          </tr>
-        </thead>
-        <tbody>
-          {records.map((rec, idx) => (
-            <tr key={idx}>
-              <td>{rec.attId}</td>
-              <td>{rec.status}</td>
-              <td>{rec.loggedInTime}</td>
-              <td>{rec.loggedOutTime || "-"}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
 );
     };
 

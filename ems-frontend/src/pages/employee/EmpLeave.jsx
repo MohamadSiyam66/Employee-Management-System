@@ -122,7 +122,7 @@ const EmpLeave = () => {
       {/* Leave Table */}
       <div className="bg-white p-4 rounded-lg shadow-md">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">Your Leaves</h3>
-        <div className="overflow-x-auto bg-white shadow rounded-lg max-h-[400px] overflow-y-auto">
+        <div className="overflow-x-auto overflow-y-auto max-h-[500px] max-md:max-w-[300px]">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-cyan-600 text-white sticky top-0">
               <tr>

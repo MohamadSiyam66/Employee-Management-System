@@ -53,7 +53,7 @@ useEffect(() => {
     }, [todayDate]);
 
 return (
-    <div className="flex flex-col gap-4 md:flex-row md:justify-evenly md:mt-10 md:bg-fuchsia-50 md:p-10 md:rounded-2xl">
+    <div className="flex flex-col gap-4 md:flex-row md:justify-evenly md:bg-fuchsia-50 md:p-10 md:rounded-2xl">
         <div className="bg-green-200 p-4 border border-black rounded shadow-lg">
             <Sun className="mb-2" />
             <h2>{new Date().toLocaleTimeString()}</h2>

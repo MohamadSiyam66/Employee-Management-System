@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Users, Calendar, Clock, FileText } from 'lucide-react';
+import { Home, Users, Calendar, Clock, FileText, X } from 'lucide-react';
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, onClose }) => {
     const [role, setRole] = useState('');
     const [name, setName] = useState('');
 
@@ -13,81 +13,84 @@ const Sidebar = () => {
         setName(storedName);
     }, []);
 
-
     return (
-        <aside className="p-2 ">
+        <aside className={`bg-white h-full md:h-full md:mt-2 shadow-lg z-50 p-2 md:relative fixed top-0 left-0 transform ${
+            isOpen ? "translate-x-0" : "-translate-x-full"
+        } transition-transform duration-300 ease-in-out md:translate-x-0 md:w-64`}>
+            {/* Close button for mobile */}
+            <div className="flex justify-between items-center md:hidden px-4 py-2">
+                <h3 className="font-semibold">Welcome, {name}</h3>
+                <button onClick={onClose}>
+                    <X size={24} />
+                </button>
+            </div>
             <nav>
-                <h3 className="ml-2 font-semibold my-2">Welcome, {name}</h3>
-                <ul className="flex flex-row justify-evenly bg-blue-300 rounded-2xl py-2">
-                {role === "ADMIN" && (
-                    <>
-                    <li>
-                        <NavLink to="/admin/home" className="flex flex-col items-center hover:text-cyan-600 p-2  border-white border-2 rounded-full active:border-black">
-                            <Home size={24} />
-                            <span className="text-xs md:block hidden">Dashboard</span>
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/admin/employee" className="flex flex-col items-center hover:text-cyan-600 p-2  border-white border-2 rounded-full active:border-black">
-                            <Users size={24} />
-                            <span className="text-xs md:block hidden">Employees</span>
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/admin/attendance" className="flex flex-col items-center hover:text-cyan-600 p-2 border-white border-2 rounded-full active:border-black">
-                            <Calendar size={24} />
-                            <span className="text-xs md:block hidden">Attendance</span>
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/admin/leave" className="flex flex-col items-center hover:text-cyan-600 p-2  border-white border-2 rounded-full active:border-black">
-                            <FileText size={24} />
-                            <span className="text-xs md:block hidden">Leave</span>
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/admin/timesheet" className="flex flex-col items-center hover:text-cyan-600 p-2  border-white border-2 rounded-full active:border-black">
-                            <Clock size={24} />
-                            <span className="text-xs md:block hidden">Timesheet</span>
-                        </NavLink>
-                    </li>
-                    </>
-                )}
-                {role === "EMPLOYEE" && (
-                    <>
-                    <li>
-                        <NavLink to="/employee/home" className="flex items-center gap-2 p-2 hover:bg-gray-100  border-white border-2 rounded-full active:border-black">
-                            <Home size={20} />
-                            <span className="text-xs md:block hidden">Dashboard</span>
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/employee/attendance" className="flex items-center gap-2 p-2 hover:bg-gray-100  border-white border-2 rounded-full active:border-black">
-                            <Calendar size={20} />
-                            <span className="text-xs md:block hidden">Attendance</span>
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/employee/leave" className="flex items-center gap-2 p-2 hover:bg-gray-100  border-white border-2 rounded-full active:border-black">
-                            <FileText size={20} />
-                            <span className="text-xs md:block hidden">Leave</span>
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink 
-                            to="/employee/timesheet" 
-                            className="flex items-center gap-2 p-2 hover:bg-gray-100  border-white border-2 rounded-full active:border-black"
-                        >
-                            <Clock size={20} />
-                            <span className="text-xs md:block hidden">Timesheet</span>
-                        </NavLink>
-                    </li>
-                    </>
-                )}
+                <ul className="space-y-2 mt-4">
+                    {role === "ADMIN" && (
+                        <>
+                            <li>
+                                <NavLink to="/admin/home" className="flex items-center gap-2 p-2 hover:text-cyan-600">
+                                    <Home size={24} />
+                                    <span>Dashboard</span>
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink to="/admin/employee" className="flex items-center gap-2 p-2 hover:text-cyan-600">
+                                    <Users size={24} />
+                                    <span>Employees</span>
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink to="/admin/attendance" className="flex items-center gap-2 p-2 hover:text-cyan-600">
+                                    <Calendar size={24} />
+                                    <span>Attendance</span>
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink to="/admin/leave" className="flex items-center gap-2 p-2 hover:text-cyan-600">
+                                    <FileText size={24} />
+                                    <span>Leave</span>
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink to="/admin/timesheet" className="flex items-center gap-2 p-2 hover:text-cyan-600">
+                                    <Clock size={24} />
+                                    <span>Timesheet</span>
+                                </NavLink>
+                            </li>
+                        </>
+                    )}
+                    {role === "EMPLOYEE" && (
+                        <>
+                            <li>
+                                <NavLink to="/employee/home" className="flex items-center gap-2 p-2 hover:text-cyan-600">
+                                    <Home size={24} />
+                                    <span>Dashboard</span>
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink to="/employee/attendance" className="flex items-center gap-2 p-2 hover:text-cyan-600">
+                                    <Calendar size={24} />
+                                    <span>Attendance</span>
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink to="/employee/leave" className="flex items-center gap-2 p-2 hover:text-cyan-600">
+                                    <FileText size={24} />
+                                    <span>Leave</span>
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink to="/employee/timesheet" className="flex items-center gap-2 p-2 hover:text-cyan-600">
+                                    <Clock size={24} />
+                                    <span>Timesheet</span>
+                                </NavLink>
+                            </li>
+                        </>
+                    )}
                 </ul>
             </nav>
         </aside>
-
     );
 };
 

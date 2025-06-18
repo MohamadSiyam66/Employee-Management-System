@@ -179,14 +179,14 @@ const Employee = () => {
 };
 
     return (
-    <div className="p-2 bg-gray-50">
+    <div className="md:p-6 bg-white shadow-xl rounded-lg mx-auto">
         <h3 className="text-2xl font-bold text-center text-cyan-700 mb-4">Employees</h3>
         {message && (
             <div className="text-center text-green-600 font-semibold mb-4">{message}</div>
         )}
 
     <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-        <div className="flex gap-2 w-full md:w-2/3">
+        <div className="flex gap-2 md:w-2/3">
         <input
             type="text"
             placeholder="Search by name"
@@ -212,7 +212,7 @@ const Employee = () => {
             </button>
         )}
         </div>
-        <div className="text-right">
+        <div className="text-right ">
         <button
             className="bg-green-500 text-white px-4 py-2 rounded shadow hover:bg-green-600"
             onClick={() => openPopup("add")}
@@ -222,14 +222,14 @@ const Employee = () => {
         </div>
     </div>
 
-    <div className="overflow-x-auto bg-white shadow rounded-lg max-h-[400px] overflow-y-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+    <div className="overflow-x-auto overflow-y-auto max-h-[500px] max-md:max-w-[300px]">
+        <table className="min-w-full max-md:w-[200px] divide-y divide-gray-200">
         <thead className="bg-cyan-600 text-white sticky top-0 z-10">
             <tr>
-            <th className="px-4 py-2 text-left">ID</th>
-            <th className="px-4 py-2 text-left">Full Name</th>
-            <th className="px-4 py-2 text-left">Position</th>
-            <th colSpan={3} className="px-4 py-2 text-left">Actions</th>
+                <th className="px-4 py-2 text-left">ID</th>
+                <th className="px-4 py-2 text-left">Full Name</th>
+                <th className="px-4 py-2 text-left">Position</th>
+                <th colSpan={3} className="px-4 py-2 text-left">Actions</th>
             </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">

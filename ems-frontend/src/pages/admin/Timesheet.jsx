@@ -38,7 +38,7 @@ const Timesheet = () => {
             </div>
 
             {/* Timesheet Table */}
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto overflow-y-auto max-h-[500px] max-md:max-w-[300px]">
                 <table className="min-w-full text-sm border border-gray-300 shadow-md rounded-lg overflow-hidden">
                     <thead className="bg-cyan-600 text-white">
                         <tr>

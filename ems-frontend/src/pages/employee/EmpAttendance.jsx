@@ -110,7 +110,7 @@ const EmpAttendance = () => {
     }, [message]);
 
     return (
-      <div className="max-w-7xl mx-auto p-2 bg-white shadow-lg rounded-lg">
+      <div className="md:p-6 bg-white shadow-xl rounded-lg mx-auto">
       <div className="flex flex-col md:flex-row gap-6 mb-6">
         {/* Add Attendance Form */}
         <div className="flex-1 bg-green-50 p-4 rounded-lg shadow-md">
@@ -196,7 +196,7 @@ const EmpAttendance = () => {
       {/* Attendance Records Table */}
       <div className="bg-gray-50 p-4 rounded-lg shadow-inner">
         <h3 className="text-lg font-semibold text-gray-800 mb-3">Attendance Records</h3>
-        <div className="overflow-x-auto bg-white shadow rounded-lg max-h-[400px] overflow-y-auto">
+        <div className="overflow-x-auto overflow-y-auto max-h-[500px] max-md:max-w-[300px]">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-cyan-600 text-white sticky top-0">
               <tr>

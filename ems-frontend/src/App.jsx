@@ -7,6 +7,10 @@ import Attendance from "./pages/admin/Attendance.jsx";
 import Leave from "./pages/admin/Leave.jsx";
 import Timesheet from "./pages/admin/Timesheet.jsx";
 import Login from "./pages/login/Login.jsx";
+import Onboarding from "./pages/admin/onboarding/Onboarding.jsx";
+import Files from "./pages/admin/onboarding/Files.jsx";
+import UploadPage from "./pages/candidate/uploadPage.jsx";
+import TaskPage from "./pages/admin/tasks/TaskPage.jsx";
 
 import EmpHome from "./pages/employee/EmpHome.jsx";
 import EmpAttendance from "./pages/employee/EmpAttendance.jsx";
@@ -31,6 +35,9 @@ function App() {
                 { path: "attendance", element: <Attendance /> },
                 { path: "leave", element: <Leave /> },
                 { path: "timesheet", element: <Timesheet /> },
+                { path: "onboarding", element: <Onboarding /> },
+                { path: "onboarding/files", element: <Files /> },
+                { path: "tasks", element: <TaskPage /> },
             ],
         },
         // Employee routes
@@ -45,6 +52,11 @@ function App() {
                 { path: "timesheet", element: <EmpTimesheet /> },
             ],
         },
+        // Candidate document upload route
+        {
+            path: "/candidate/upload",
+            element: <UploadPage />,
+        }
     ]);
 
     return <RouterProvider router={router} />;

@@ -1,1 +1,17 @@
 @import "tailwindcss";
+
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg;
+}
+.btn-secondary {
+  @apply bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg;
+}
+.btn-gray {
+  @apply bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg;
+}
+.btn-green {
+  @apply bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg;
+}
+.btn-yellow {
+  @apply bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-lg;
+}

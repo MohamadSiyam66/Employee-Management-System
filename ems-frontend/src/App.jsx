@@ -11,6 +11,7 @@ import Onboarding from "./pages/admin/onboarding/Onboarding.jsx";
 import Files from "./pages/admin/onboarding/Files.jsx";
 import UploadPage from "./pages/candidate/uploadPage.jsx";
 import TaskPage from "./pages/admin/tasks/TaskPage.jsx";
+import EmpTask from "./pages/employee/tasks/EmpTask.jsx";
 
 import EmpHome from "./pages/employee/EmpHome.jsx";
 import EmpAttendance from "./pages/employee/EmpAttendance.jsx";
@@ -50,6 +51,7 @@ function App() {
                 { path: "attendance", element: <EmpAttendance /> },
                 { path: "leave", element: <EmpLeave /> },
                 { path: "timesheet", element: <EmpTimesheet /> },
+                { path: "tasks", element: <EmpTask /> },
             ],
         },
         // Candidate document upload route

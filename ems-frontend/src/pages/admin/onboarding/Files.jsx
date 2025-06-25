@@ -6,7 +6,7 @@ const Files = () => {
     const [docs, setDocs] = useState([]);
 
     useEffect(() => {
-        axios.get(`${BASE_URL}/api/candidate/candidates`) // http://localhost:8080/api/candidate/candidates
+        axios.get(`http://localhost:8080/api/candidate/candidates`) //  ${BASE_URL}/api/candidate/candidates
             .then((res) => setDocs(res.data))
             .catch((err) => console.error("Failed to fetch documents", err));
     }, []);

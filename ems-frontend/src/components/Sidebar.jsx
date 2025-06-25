@@ -19,22 +19,23 @@ const Sidebar = ({ isOpen, onClose }) => {
     }, []);
 
     return (
-        <aside className={`bg-white h-full md:h-full md:mt-2 shadow-lg z-50 p-2 md:relative fixed top-0 left-0 transform ${
+        <aside className={`bg-blue-50 rounded-lg h-screen md:h-[600px] mt-2 shadow-lg z-50 p-2 md:relative fixed top-0 left-0 transform ${
             isOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300 ease-in-out md:translate-x-0 md:w-64`}>
             
             {/* Close button for mobile */}
             <div className="flex justify-between items-center md:hidden px-4 py-2">
-                <h3 className="font-semibold">Welcome, {name}</h3>
-                <button onClick={onClose}>
+                <h3 className="font-semibold bg-cyan-600 p-2 text-white rounded-2xl">Welcome, {name}</h3>
+                <button onClick={onClose} className='p-1 rounded text-red-600 hover:text-white'>
                     <X size={24} />
                 </button>
             </div>
 
             <nav>
-                <ul className="space-y-2 mt-4">
+                <ul className="space-y-2 mt-4 ">
                     {role === "ADMIN" && (
-                        <>
+                        <div className='space-y-2'>  
+                            <h4 className="max-md:hidden text-lg font-semibold text-center p-2 bg-cyan-600 text-white rounded-2xl">Welcome, {name}</h4>
                             <li>
                                 <NavLink to="/admin/home" className="flex items-center gap-2 p-2 hover:text-cyan-600">
                                     <Home size={24} />
@@ -68,6 +69,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                                         <li>
                                             <NavLink to="/admin/timesheet" className="block p-1 hover:text-cyan-600">Timesheet</NavLink>
                                         </li>
+                                        
                                     </ul>
                                 )}
                             </li>
@@ -102,11 +104,12 @@ const Sidebar = ({ isOpen, onClose }) => {
                                     <span>Task Management</span>
                                 </NavLink>
                             </li>
-                        </>
+                        </div>
                     )}
 
                     {role === "EMPLOYEE" && (
                         <>
+                            <h4 className="max-md:hidden text-lg font-semibold text-center p-2 bg-cyan-600 text-white rounded-2xl">Welcome, {name}</h4>
                             <li>
                                 <NavLink to="/employee/home" className="flex items-center gap-2 p-2 hover:text-cyan-600">
                                     <Home size={24} />
@@ -129,6 +132,12 @@ const Sidebar = ({ isOpen, onClose }) => {
                                 <NavLink to="/employee/timesheet" className="flex items-center gap-2 p-2 hover:text-cyan-600">
                                     <Clock size={24} />
                                     <span>Timesheet</span>
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink to="/employee/tasks" className="flex items-center gap-2 p-2 hover:text-cyan-600">
+                                    <BookOpenCheck size={24} />
+                                    <span>Tasks</span>
                                 </NavLink>
                             </li>
                         </>

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import BASE_URL from "../../api.js";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const UploadPage = () => {
     const [form, setForm] = useState({
@@ -25,8 +27,8 @@ const UploadPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post(`${BASE_URL}/api/candidate/upload`, form); // http://localhost:8080/api/candidate/upload
-            alert("Documents submitted successfully!");
+            await axios.post(`${BASE_URL}/api/candidate/upload`, form);
+            toast.success("Documents submitted successfully!");
             setForm({
                 name: "",
                 email: "",
@@ -39,13 +41,25 @@ const UploadPage = () => {
             setSubmitted(true);
         } catch (error) {
             console.error("Upload failed:", error);
-            alert("Something went wrong. Please try again.");
+            toast.error("Something went wrong. Please try again.");
         }
     };
 
     if (submitted) {
         return (
             <div className="max-w-xl mx-auto p-6 bg-white rounded shadow text-center">
+                <ToastContainer
+                    position="top-right"
+                    autoClose={3000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="light"
+                />
                 <h2 className="text-2xl font-semibold text-green-700">Thank you! 🎉</h2>
                 <p className="mt-4 text-gray-600">Your documents have been submitted successfully.</p>
             </div>
@@ -54,6 +68,18 @@ const UploadPage = () => {
 
     return (
         <div className="max-w-xl mx-auto p-6 bg-white rounded shadow">
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
             <h2 className="text-2xl font-semibold mb-6 text-center">Candidate Onboading Form</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>

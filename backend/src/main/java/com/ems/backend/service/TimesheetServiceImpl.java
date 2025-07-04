@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,7 +34,8 @@ public class TimesheetServiceImpl implements TimesheetService {
                         tmsheet.getEndTime(),
                         tmsheet.getWorkHours(),
                         tmsheet.getEmployee().getFname(),
-                        tmsheet.getEmployee().getLname()
+                        tmsheet.getEmployee().getLname(),
+                        tmsheet.getWorkSummery()
                 ))
                 .collect(Collectors.toList());
     }
@@ -67,67 +70,65 @@ public class TimesheetServiceImpl implements TimesheetService {
             }
         }
 
-        if (updateTimesheet.getOutTime() != null) {
-            if (existingTmsheet.getOutTime() == null) {
-                existingTmsheet.setOutTime(updateTimesheet.getOutTime());
-            } else {
-                errorMessages.append("Out time cannot be updated again. ");
-            }
-        }
-
-        if (updateTimesheet.getInTime() != null) {
-            if (existingTmsheet.getInTime() == null) {
-                existingTmsheet.setInTime(updateTimesheet.getInTime());
-            } else {
-                errorMessages.append("In time cannot be updated again. ");
-            }
-        }
-
-        if (updateTimesheet.getEndTime() != null) {
-            if (existingTmsheet.getEndTime() == null) {
-                existingTmsheet.setEndTime(updateTimesheet.getEndTime());
-            } else {
-                errorMessages.append("End time cannot be updated again. ");
-            }
-        }
-
         // If any error occurred, throw combined message
         if (!errorMessages.isEmpty()) {
             throw new RuntimeException(errorMessages.toString().trim());
         }
 
         // Calculate work hours
-        if (existingTmsheet.getStartTime() != null && existingTmsheet.getEndTime() != null)
-        {
+//        if (existingTmsheet.getStartTime() != null && existingTmsheet.getEndTime() != null)
+//        {
+//
+//            long totalMinutes = Duration.between(existingTmsheet.getStartTime(), existingTmsheet.getEndTime()).toMinutes();
+//
+//            // Let lunchtime to 0 by default
+//            long lunchMinutes = 0;
+//            if (existingTmsheet.getOutTime() != null && existingTmsheet.getInTime() != null) {
+//                lunchMinutes = Duration.between(existingTmsheet.getLunchOutTime(), existingTmsheet.getLunchInTime()).toMinutes();
+//            }
+//
+//            // Let out time to 0 by default
+//            long outMinutes = 0;
+//            if (existingTmsheet.getOutTime() != null && existingTmsheet.getInTime() != null) {
+//                outMinutes = Duration.between(existingTmsheet.getOutTime(), existingTmsheet.getInTime()).toMinutes();
+//            }
+//
+//            long netMinutes = totalMinutes - (lunchMinutes + outMinutes);
+//            long netSeconds = netMinutes * 60;
+//
+//            Duration duration = Duration.ofSeconds(netSeconds);
+//
+//            long hours = duration.toHours();
+//            long minutes = duration.toMinutesPart();
+////            long seconds = duration.toSecondsPart();
+//
+//            String formatted = String.format("%02d:%02d", hours, minutes);
+//            existingTmsheet.setWorkHours(formatted);
+//        }
 
-            long totalMinutes = Duration.between(existingTmsheet.getStartTime(), existingTmsheet.getEndTime()).toMinutes();
-
-            // Let lunchtime to 0 by default
-            long lunchMinutes = 0;
-            if (existingTmsheet.getOutTime() != null && existingTmsheet.getInTime() != null) {
-                lunchMinutes = Duration.between(existingTmsheet.getLunchOutTime(), existingTmsheet.getLunchInTime()).toMinutes();
-            }
-
-            // Let out time to 0 by default
-            long outMinutes = 0;
-            if (existingTmsheet.getOutTime() != null && existingTmsheet.getInTime() != null) {
-                outMinutes = Duration.between(existingTmsheet.getOutTime(), existingTmsheet.getInTime()).toMinutes();
-            }
-
-            long netMinutes = totalMinutes - (lunchMinutes + outMinutes);
-            long netSeconds = netMinutes * 60;
-
-            Duration duration = Duration.ofSeconds(netSeconds);
-
-            long hours = duration.toHours();
-            long minutes = duration.toMinutesPart();
-            long seconds = duration.toSecondsPart();
-
-            String formatted = String.format("%02d:%02d:%02d", hours, minutes, seconds);
-            existingTmsheet.setWorkHours(formatted);
+        if (updateTimesheet.getOutTime() != null) {
+            existingTmsheet.setOutTime(updateTimesheet.getOutTime());
+        }
+        if (updateTimesheet.getInTime() != null) {
+            existingTmsheet.setInTime(updateTimesheet.getInTime());
+        }
+        if (updateTimesheet.getEndTime() != null) {
+            existingTmsheet.setEndTime(updateTimesheet.getEndTime());
+        }
+        if (updateTimesheet.getWorkHours() != null) {
+            existingTmsheet.setWorkHours(updateTimesheet.getWorkHours());
+        }
+        if (updateTimesheet.getWorkSummery() != null) {
+            existingTmsheet.setWorkSummery(updateTimesheet.getWorkSummery());
         }
 
         return timesheetRepository.save(existingTmsheet);
+    }
+
+    @Override
+    public Optional<Integer> getTimesheetIdByEmpIdAndDate(Integer empId, LocalDate date) {
+        return timesheetRepository.findByEmployeeEmpIdAndDate(empId, date)
+                .map(Timesheet::getTimesheetId);
     }
 
 

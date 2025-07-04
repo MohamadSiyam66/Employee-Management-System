@@ -23,4 +23,5 @@ public class TimesheetDTO {
     private String workHours;
     private String fname;
     private String lname;
+    private String workSummery;
 }

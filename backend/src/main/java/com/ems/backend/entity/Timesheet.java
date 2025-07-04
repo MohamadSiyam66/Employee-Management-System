@@ -49,4 +49,7 @@ public class Timesheet {
     @Column(name = "work_hours")
     private String workHours;
 
+    @Column(name = "work_summery")
+    private String workSummery;
+
 }

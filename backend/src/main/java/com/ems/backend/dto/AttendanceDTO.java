@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Data
 @AllArgsConstructor
@@ -19,6 +20,6 @@ public class AttendanceDTO {
     private LocalDate date;
     private Attendance.Status status;
     private String designation;
-    private LocalDateTime loggedInTime;
-    private LocalDateTime loggedOutTime;
+    private LocalTime loggedInTime;
+    private LocalTime loggedOutTime;
 }

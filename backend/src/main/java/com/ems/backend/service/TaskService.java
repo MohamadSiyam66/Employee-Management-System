@@ -11,4 +11,5 @@ public interface TaskService {
     List<Task> getTasksByEmployee(Long empId);
     List<Task> getAllTasks();
     Task assignTeamToTask(Long taskId, Integer teamId);
+    void teamLeadRespondToTask(Long taskId, String decision, String reason);
 }

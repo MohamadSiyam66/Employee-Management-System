@@ -1,5 +1,6 @@
 package com.ems.backend.controller;
 
+import com.ems.backend.dto.TeamDTO;
 import com.ems.backend.entity.Task;
 import com.ems.backend.entity.Team;
 import com.ems.backend.service.TaskService;
@@ -37,6 +38,21 @@ public class TeamController {
     @PutMapping("/{taskId}/assign-team/{teamId}")
     public ResponseEntity<Task> assignTeamToTask(@PathVariable Long taskId, @PathVariable Integer teamId) {
         return ResponseEntity.ok(taskService.assignTeamToTask(taskId, teamId));
+    }
+
+    @GetMapping("/team-dto")
+    public ResponseEntity<List<TeamDTO>> getTeamDTOs() {
+        return ResponseEntity.ok(teamService.getAllTeamsWithTasks());
+    }
+
+    @GetMapping("/employee/{empId}")
+    public ResponseEntity<TeamDTO> getTeamByEmployeeId(@PathVariable Long empId) {
+        return ResponseEntity.ok(teamService.getTeamByEmployeeId(empId));
+    }
+
+    @GetMapping("/employee/{employeeId}/teams")
+    public ResponseEntity<List<TeamDTO>> getTeamsByEmployeeId(@PathVariable Long employeeId) {
+        return ResponseEntity.ok(teamService.getTeamsByEmployeeId(employeeId));
     }
 
 }

@@ -2,6 +2,7 @@ package com.ems.backend.controller;
 
 import com.ems.backend.dto.TaskRequestDTO;
 import com.ems.backend.dto.TaskUpdateDTO;
+import com.ems.backend.dto.TeamLeadTaskDecisionDTO;
 import com.ems.backend.entity.Employee;
 import com.ems.backend.entity.Task;
 import com.ems.backend.repository.EmployeeRepository;
@@ -61,5 +62,14 @@ public class TaskController {
         return ResponseEntity.ok(taskService.getTasksByEmployee(empId));
     }
 
+    @PutMapping("/team-lead-task/{taskId}")
+    public ResponseEntity<String> teamLeadRespondToTask( @PathVariable Long taskId, @RequestBody TeamLeadTaskDecisionDTO dto) {
+        try {
+            taskService.teamLeadRespondToTask(taskId, dto.getDecision(), dto.getReason());
+            return ResponseEntity.ok("Task has been " + dto.getDecision().toLowerCase() + "ed by the team lead.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
 }

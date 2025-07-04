@@ -1,5 +1,7 @@
 package com.ems.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,7 +38,8 @@ public class Task {
     private Employee assignedToId;
 
     @ManyToOne
-    @JoinColumn(name = "team_id")
+    @JoinColumn(name = "team_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_assigned_team"))
+    @JsonIgnore
     private Team team;
 
     @Enumerated(EnumType.STRING)

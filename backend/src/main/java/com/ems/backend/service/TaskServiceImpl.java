@@ -89,4 +89,31 @@ public class TaskServiceImpl implements TaskService {
         }
         return taskRepository.save(task);
     }
+
+    @Override
+    public void teamLeadRespondToTask(Long taskId, String decision, String reason) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        if (task.getTeam() == null || task.getTeam().getTeamLead() == null) {
+            throw new RuntimeException("Task is not assigned to a team with a lead.");
+        }
+
+        if (decision.equalsIgnoreCase("ACCEPT")) {
+            task.setAcceptingStatus(Task.AcceptingStatus.ACCEPTED);
+            task.setRejectingReason(null);
+        } else {
+            task.setAcceptingStatus(Task.AcceptingStatus.REJECTED);
+            task.setRejectingReason(reason != null ? reason : "No reason provided");
+        }
+        taskRepository.save(task);
+
+        // Notify the owner
+        Notification notification = new Notification();
+        notification.setRecipientId(task.getOwnerId());
+        notification.setTaskId(task);
+        notification.setType(Notification.Type.ACCEPTED);
+        notification.setMessage("Your task '" + task.getName() + "' was " + decision.toLowerCase() + "ed by the team lead.");
+        notificationRepository.save(notification);
+    }
 }

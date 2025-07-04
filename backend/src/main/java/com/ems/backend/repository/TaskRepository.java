@@ -12,5 +12,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByAssignedToId_EmpId(Long empId);
     List<Task> findByOwnerId(Employee ownerId);
     List<Task> findByReminderDate(LocalDate reminderDate);
+    List<Task> findByTeam_Id(Long id);
 }
 

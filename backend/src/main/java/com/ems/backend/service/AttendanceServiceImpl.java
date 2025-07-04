@@ -4,10 +4,13 @@ import com.ems.backend.dto.AttendanceDTO;
 import com.ems.backend.entity.Attendance;
 import com.ems.backend.repository.AttendanceRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,7 +45,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public Attendance saveAttendance(Attendance attendance) {
         if (attendance.getEmployee() == null) {
-            throw new IllegalArgumentException("Employee must be specified for attendance");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Employee must be specified for attendance");
         }
 
         LocalDate today = LocalDate.now();
@@ -54,7 +57,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         if (attendance.getAttId() == null && existing.isPresent()) {
             // New record, but already exists
-            throw new RuntimeException("Attendance already marked for today.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Attendance already marked for today.");
+
         }
 
         if (attendance.getStatus() == Attendance.Status.ABSENT) {
@@ -80,7 +84,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public Attendance updateAttendance(Long attId, Attendance updatedAtt) {
         Attendance existingAtt = attendanceRepository.findById(attId)
-                .orElseThrow(() -> new IllegalArgumentException("Attendance not found for: " + attId));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"Attendance not found for: " + attId));
 
         // Update status and times
         if (updatedAtt.getStatus() != null) {
@@ -111,13 +115,13 @@ public class AttendanceServiceImpl implements AttendanceService {
         LocalDate today = LocalDate.now();
 
         Attendance attendance = attendanceRepository.findByEmployeeEmpIdAndDate(Math.toIntExact(empId), today)
-                .orElseThrow(() -> new RuntimeException("No attendance found for today."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"No attendance found for today."));
 
         if (attendance.getLoggedOutTime() != null) {
-            throw new RuntimeException("Logout time already recorded for today.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Logout time already recorded for today.");
         }
 
-        attendance.setLoggedOutTime(LocalDateTime.now());
+        attendance.setLoggedOutTime(LocalTime.now());
         return attendanceRepository.save(attendance);
     }
 

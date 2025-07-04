@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "attendance")
@@ -29,9 +30,9 @@ public class Attendance {
     @Column(nullable = false)
     private Status status;
 
-    private LocalDateTime loggedInTime;
+    private LocalTime loggedInTime;
 
-    private LocalDateTime loggedOutTime;
+    private LocalTime loggedOutTime;
 
     public enum Status {
         PRESENT,

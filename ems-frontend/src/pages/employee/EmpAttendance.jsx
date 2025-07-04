@@ -1,227 +1,256 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import BASE_URL from '../../api';
+import { toast } from 'react-toastify';
+import { CheckCircle, XCircle } from 'lucide-react';
+import { ToastContainer } from 'react-toastify';
 
 const EmpAttendance = () => {
     const emp = localStorage.getItem("userId");
-    const [attendance, setAttendance] = useState({
-        date: "",
-        status: "PRESENT",
-        loggedInTime: "",
-    });
-    const [logoutData, setLogoutData] = useState({
-        attendanceId: "",
-        loggedOutTime: "",
-    });
     const [records, setRecords] = useState([]);
-    const [message, setMessage] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [summary, setSummary] = useState(null);
 
-    const handleAddChange = (e) => {
-        setAttendance({ ...attendance, [e.target.name]: e.target.value });
-    };
-
-    const handleLogoutChange = (e) => {
-        setLogoutData({ ...logoutData, [e.target.name]: e.target.value });
-    };
-
+    // get all attendance records for the employee
     const fetchAttendance = async () => {
+        setLoading(true);
         try {
             const res = await axios.get(`${BASE_URL}/api/attendance/attendances`);
             const emp = localStorage.getItem("userId");
             const filtered = res.data.filter((att) => String(att.empId) === String(emp));
-            console.log(filtered);
             setRecords(filtered);
         } catch (err) {
-            console.error("Failed to fetch attendance", err);
+            const message = err.response?.data?.message;
+            toast.error(message);
+        } finally {
+            setLoading(false);
         }
-    };
-
-    const handleAddSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      const loginDate = attendance.loggedInTime.split("T")[0]; // Extract date
-
-      // Check if today's attendance already exists
-      const hasTodayAttendance = records.some(
-        (rec) => rec.date === loginDate
-      );
-
-      if (hasTodayAttendance) {
-        setMessage("You have already marked attendance for today.");
-        return;
-      }
-
-      const payload = {
-        employee: { empId: emp },
-        ...attendance,
-        date: loginDate,
-      };
-
-      await axios.post(`${BASE_URL}/api/attendance/add`, payload);
-      setMessage("Attendance added.");
-      setAttendance({ empId: "", date: "", status: "PRESENT", loggedInTime: "" });
-      fetchAttendance();
-    } catch (err) {
-      setMessage("Error adding attendance.");
-      console.error(err);
-    }
-  };
-
-
-
-    const handleLogoutSubmit = async (e) => {
-      e.preventDefault();
-
-      try {
-        const rec = records.find(
-          (r) => String(r.attId) === String(logoutData.attendanceId)
-        );
-
-        if (!rec) {
-          setMessage("Attendance ID not found.");
-          return;
-        }
-
-        if (rec.loggedOutTime) {
-          setMessage("Logout time already recorded for this attendance.");
-          return;
-        }
-
-        await axios.put(`${BASE_URL}/api/attendance/update/${logoutData.attendanceId}`, {
-          loggedOutTime: logoutData.loggedOutTime,
-        });
-
-        setMessage("Logout time updated.");
-        setLogoutData({ attendanceId: "", loggedOutTime: "" });
-        fetchAttendance();
-      } catch (err) {
-        setMessage("Error updating logout time.");
-        console.error(err);
-      }
     };
 
     useEffect(() => {
         fetchAttendance();
-        if (message) {
-          const timer = setTimeout(() => setMessage(""), 3000);
-          return () => clearTimeout(timer);
+    }, []);
+
+    useEffect(() => {
+        // Calculate summary
+        if (records.length) {
+            const total = records.length;
+            const present = records.filter(r => r.status === 'PRESENT').length;
+            const absent = records.filter(r => r.status === 'ABSENT').length;
+            setSummary({ total, present, absent });
         }
-    }, [message]);
+    }, [records]);
 
-    return (
-      <div className="md:p-6 bg-white shadow-xl rounded-lg mx-auto">
-      <div className="flex flex-col md:flex-row gap-6 mb-6">
-        {/* Add Attendance Form */}
-        <div className="flex-1 bg-green-50 p-4 rounded-lg shadow-md">
-          <h3 className="text-xl font-semibold mb-4 text-green-700">Mark Attendance</h3>
-          <form className="flex flex-col gap-4" onSubmit={handleAddSubmit}>
-            <div>
-              <label className="block font-medium text-gray-700 mb-1">Status:</label>
-              <select
-                name="status"
-                value={attendance.status}
-                onChange={handleAddChange}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-400"
-              >
-                <option value="PRESENT">PRESENT</option>
-                <option value="ABSENT">ABSENT</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block font-medium text-gray-700 mb-1">Login Time:</label>
-              <input
-                type="datetime-local"
-                name="loggedInTime"
-                value={attendance.loggedInTime}
-                onChange={handleAddChange}
-                required
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-400"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
-            >
-              Add
-            </button>
-          </form>
-        </div>
-
-        {/* Update Logout Form */}
-        <div className="flex-1 bg-blue-50 p-4 rounded-lg shadow-md">
-          <h4 className="text-xl font-semibold mb-4 text-blue-700">Update Logout</h4>
-          <form className="flex flex-col gap-4" onSubmit={handleLogoutSubmit}>
-            <div>
-              <label className="block font-medium text-gray-700 mb-1">Attendance ID:</label>
-              <input
-                type="text"
-                name="attendanceId"
-                value={logoutData.attendanceId}
-                onChange={handleLogoutChange}
-                required
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-
-            <div>
-              <label className="block font-medium text-gray-700 mb-1">Logout Time:</label>
-              <input
-                type="datetime-local"
-                name="loggedOutTime"
-                value={logoutData.loggedOutTime}
-                onChange={handleLogoutChange}
-                required
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-            >
-              Update Logout
-            </button>
-          </form>
-        </div>
-      </div>
-
-      {/* Message */}
-      {message && (
-        <p className="text-center text-sm text-gray-600 font-medium mb-4">{message}</p>
-      )}
-
-      {/* Attendance Records Table */}
-      <div className="bg-gray-50 p-4 rounded-lg shadow-inner">
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">Attendance Records</h3>
-        <div className="overflow-x-auto overflow-y-auto max-h-[500px] max-md:max-w-[300px]">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-cyan-600 text-white sticky top-0">
-              <tr>
-                <th className="p-3 border">ID</th>
-                <th className="p-3 border">Status</th>
-                <th className="p-3 border">Login</th>
-                <th className="p-3 border">Logout</th>
-              </tr>
-            </thead>
-            <tbody className='bg-white divide-y divide-gray-200'>
-              {records.map((rec, idx) => (
-                <tr key={idx} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 whitespace-nowrap">{rec.attId}</td>
-                  <td className="px-4 py-2 whitespace-nowrap">{rec.status}</td>
-                  <td className="px-4 py-2 whitespace-nowrap">{rec.loggedInTime}</td>
-                  <td className="px-4 py-2 whitespace-nowrap">{rec.loggedOutTime || "-"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-);
+    const getStatusBadge = (status) => {
+        return status === 'PRESENT' 
+            ? 'bg-green-100 text-green-800' 
+            : 'bg-red-100 text-red-800';
     };
 
-    export default EmpAttendance;
+    const handleQuickAttendance = async (status) => {
+        setLoading(true);
+        try {
+            const now = new Date();
+            const date = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Colombo' }); // YYYY-MM-DD
+            const time = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Colombo' }); // HH:mm
+            const payload = {
+                employee: { empId: emp },
+                status,
+                date,
+                ...(status === 'PRESENT' ? { loggedInTime: time } : {})
+            };
+            await axios.post(`${BASE_URL}/api/attendance/add`, payload);
+            toast.success(`Attendance marked as ${status}!`);
+            await fetchAttendance();
+        } catch (error) {
+            const message = error.response?.data?.message;
+            toast.error(message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-50 p-6">
+            <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="light" />
+            <div className="max-w-6xl mx-auto">
+                {/* Header */}
+                <div className="mb-8">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900 mb-2">My Attendance</h1>
+                            <p className="text-gray-600">Manage and view your attendance records</p>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-sm text-gray-500">Today</p>
+                            <p className="text-lg font-semibold text-gray-900">
+                                {new Date().toLocaleDateString('en-US', { 
+                                    weekday: 'long', 
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric' 
+                                })}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Summary Cards */}
+                {summary && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div className="bg-white rounded-lg shadow-md p-6">
+                            <div className="flex items-center">
+                                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                </div>
+                                <div className="ml-4">
+                                    <p className="text-sm font-medium text-gray-500">Total Days</p>
+                                    <p className="text-2xl font-bold text-gray-900">{summary.total}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-white rounded-lg shadow-md p-6">
+                            <div className="flex items-center">
+                                <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+                                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <div className="ml-4">
+                                    <p className="text-sm font-medium text-gray-500">Present</p>
+                                    <p className="text-2xl font-bold text-gray-900">{summary.present}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-white rounded-lg shadow-md p-6">
+                            <div className="flex items-center">
+                                <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
+                                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </div>
+                                <div className="ml-4">
+                                    <p className="text-sm font-medium text-gray-500">Absent</p>
+                                    <p className="text-2xl font-bold text-gray-900">{summary.absent}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Forms */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    {/* Quick Attendance Buttons */}
+                    <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+                        <div className="px-6 py-4 border-b border-gray-200">
+                            <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                                Quick Mark Attendance
+                            </h3>
+                        </div>
+                        <div className="p-6 flex gap-4">
+                            <button
+                                onClick={() => handleQuickAttendance('PRESENT')}
+                                disabled={loading}
+                                className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                            >
+                                <CheckCircle size={20} />
+                                Present
+                            </button>
+                            <button
+                                onClick={() => handleQuickAttendance('ABSENT')}
+                                disabled={loading}
+                                className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                            >
+                                <XCircle size={20} />
+                                Absent
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Attendance Records Table */}
+                <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div className="px-6 py-4 border-b border-gray-200">
+                        <h3 className="text-xl font-semibold text-gray-900">Attendance Records</h3>
+                        <p className="text-sm text-gray-600 mt-1">Your complete attendance history</p>
+                    </div>
+                    
+                    {loading ? (
+                        <div className="p-8 text-center">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                            <p className="mt-4 text-gray-600">Loading attendance records...</p>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <thead className="bg-gray-50">
+                                        <tr>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                ID
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Date
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Status
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Login Time
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Logout Time
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                        {records.map((rec, idx) => (
+                                            <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                    {rec.attId}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                    {rec.date}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(rec.status)}`}>
+                                                        {rec.status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                    {rec.loggedInTime || 'N/A'}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                    {rec.loggedOutTime || '-'}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            {records.length === 0 && (
+                                <div className="text-center py-12">
+                                    <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                    <h3 className="mt-2 text-sm font-medium text-gray-900">No attendance records found</h3>
+                                    <p className="mt-1 text-sm text-gray-500">Start by marking your attendance for today.</p>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
+
+                {/* Record Count */}
+                <div className="mt-4 text-sm text-gray-600">
+                    Showing {records.length} attendance records
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default EmpAttendance;

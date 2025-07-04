@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
-import { ClipboardList, UserPlus } from 'lucide-react';
+import { ClipboardList, UserPlus, Briefcase, Users } from 'lucide-react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import BASE_URL from '../../../api';
+
 import TaskList from '../../../components/TaskList';
 import CreateTeam from '../../../components/task/CreateTeam';
 import TaskTable from '../../../components/task/TaskTable';
 import AssignTaskForm from './../../../components/task/AssignTaskForm ';
-
+import CreateTaskForm from '../../../components/task/CreateTaskForm';
+import TeamTaskTable from '../../../components/task/TeamTaskTable';
 
 const TaskPage = () => {
     const [taskForm, setTaskForm] = useState({
@@ -36,16 +39,27 @@ const TaskPage = () => {
     const [tasks, setTasks] = useState([]);
     const [employees, setEmployees] = useState([]);
     const [ownerName, setOwnerName] = useState('');
+    const [teams, setTeams] = useState([]);
+
 
     useEffect(() => {
         const storedName = localStorage.getItem("userName");
         setOwnerName(storedName || '');
 
-        axios.get('http://localhost:8080/api/task/tasks')
+        axios.get(`${BASE_URL}/api/task/tasks`)
             .then(res => setTasks(res.data))
             .catch(err => console.error('Error fetching tasks:', err));
 
-        axios.get('http://localhost:8080/api/employee/employees')
+        // axios.get('http://localhost:8080/api/team/teams')
+        //     .then(res => setTeams(res.data))
+        //     .catch(err => console.error('Error fetching teams:', err));
+
+        axios.get(`${BASE_URL}/api/team/team-dto`)
+            .then(res => setTeams(res.data))
+            .catch(err => console.error('Error fetching teams:', err));
+        console.log(teams);
+
+        axios.get(`${BASE_URL}/api/employee/employees`)
             .then(res => {
                 setEmployees(res.data);
                 // Match name from localStorage with employee full name
@@ -67,69 +81,71 @@ const TaskPage = () => {
     const handleAssignChange = (e) => {
         setAssignedTask({ ...assignedTask, [e.target.name]: e.target.value });
     };
+    // Create task function
     const createTask = async (e) => {
-    e.preventDefault();
-    try {
-        const payload = {
-        name: taskForm.name,
-        description: taskForm.desc,
-        startDate: taskForm.startDate,
-        dueDate: taskForm.dueDate,
-        reminderDate: taskForm.reminder,
-        status: taskForm.status,
-        priority: taskForm.priority,
-        acceptingStatus: taskForm.acceptingStatus,
-        rejectingReason: taskForm.rejectingReason,
-        ownerId: taskForm.owner
-        };
-        await axios.post('http://localhost:8080/api/task/add', payload);
-        Swal.fire({
-            icon: 'success',
-            title: 'Task Created',
-            text: 'The task was successfully created!',
-            timer: 2000,
-            showConfirmButton: false
-        });
+        e.preventDefault();
+        try {
+            const payload = {
+                name: taskForm.name,
+                description: taskForm.desc,
+                startDate: taskForm.startDate,
+                dueDate: taskForm.dueDate,
+                reminderDate: taskForm.reminder,
+                status: taskForm.status,
+                priority: taskForm.priority,
+                acceptingStatus: taskForm.acceptingStatus,
+                rejectingReason: taskForm.rejectingReason,
+                ownerId: taskForm.owner
+            };
+            await axios.post(`${BASE_URL}/api/task/add`, payload);
+            Swal.fire({
+                icon: 'success',
+                title: 'Task Created',
+                text: 'The task was successfully created!',
+                timer: 2000,
+                showConfirmButton: false
+            });
+
         // fetch updated tasks after creation
-        const response1 = await axios.get('http://localhost:8080/api/task/tasks');
-        setTasks(response1.data);
+            const response1 = await axios.get(`${BASE_URL}/api/task/tasks`);
+            setTasks(response1.data);
 
-        setTaskForm({
-        owner: taskForm.owner,
-        name: '',
-        desc: '',
-        startDate: '',
-        dueDate: '',
-        status: 'PENDING',
-        priority: 'LOW',
-        reminder: '',
-        acceptingStatus: 'PENDING',
-        rejectingReason: '',
-        });
+            setTaskForm({
+                owner: taskForm.owner,
+                name: '',
+                desc: '',
+                startDate: '',
+                dueDate: '',
+                status: 'PENDING',
+                priority: 'LOW',
+                reminder: '',
+                acceptingStatus: 'PENDING',
+                rejectingReason: '',
+            });
 
-        const response = await axios.get('http://localhost:8080/api/task/tasks');
-        setTasks(response.data);
-    } catch (error) {
-        console.error('Error creating task:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'There was an error creating the task.',
-            timer: 2000,
-            showConfirmButton: false
-        });
-    }
+            const response = await axios.get(`${BASE_URL}/api/task/tasks`);
+            setTasks(response.data);
+        } catch (error) {
+            console.error('Error creating task:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'There was an error creating the task.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
     };
 
     const assignTask = async (e) => {
     e.preventDefault();
     try {
-        await axios.put(`http://localhost:8080/api/task/update/${assignedTask.taskId}`, {
+        await axios.put(`${BASE_URL}/api/task/update/${assignedTask.taskId}`, {
             assignedToId: assignedTask.employeeId
         });
 
         // send notification
-        await axios.post("http://localhost:8080/api/notifications/send", {
+        await axios.post(`${BASE_URL}/api/notifications/send`, {
             recipientId: assignedTask.employeeId,
             taskId: assignedTask.taskId,
             type: "ASSIGNED",
@@ -137,15 +153,15 @@ const TaskPage = () => {
         });
 
         Swal.fire({
-        icon: 'success',
-        title: 'Task Assigned',
-        text: 'The task was successfully assigned!',
-        timer: 2000,
-        showConfirmButton: false
+            icon: 'success',
+            title: 'Task Assigned',
+            text: 'The task was successfully assigned!',
+            timer: 2000,
+            showConfirmButton: false
         });
 
         // Refresh task list
-        const updatedTasks = await axios.get('http://localhost:8080/api/task/tasks');
+        const updatedTasks = await axios.get(`${BASE_URL}/api/task/tasks`);
         setTasks(updatedTasks.data);
 
         // Reset assign form
@@ -166,200 +182,112 @@ const TaskPage = () => {
     }
     };
 
+    // update task completed
     const markTaskCompleted = async (taskId) => {
-  try {
-    await axios.put(`http://localhost:8080/api/task/update/${taskId}`, {
-      status: 'COMPLETED'
-    });
+        try {
+            await axios.put(`${BASE_URL}/api/task/update/${taskId}`, {
+            status: 'COMPLETED'
+            });
 
-    Swal.fire({
-      icon: 'success',
-      title: 'Task Completed',
-      text: 'The task status has been updated to COMPLETED',
-      timer: 2000,
-      showConfirmButton: false
-    });
+            Swal.fire({
+                icon: 'success',
+                title: 'Task Completed',
+                text: 'The task status has been updated to COMPLETED',
+                timer: 2000,
+                showConfirmButton: false
+            });
 
-    // Refresh task list
-    const updatedTasks = await axios.get('http://localhost:8080/api/task/tasks');
-    setTasks(updatedTasks.data);
-  } catch (error) {
-    console.error('Error updating task:', error);
-    Swal.fire({
-      icon: 'error',
-      title: 'Update Failed',
-      text: 'There was an error updating the task status',
-      timer: 2000,
-      showConfirmButton: false
-    });
-  }
-};
+            // Refresh task list
+            const updatedTasks = await axios.get(`${BASE_URL}/api/task/tasks`);
+            setTasks(updatedTasks.data);
+        } catch (error) {
+            console.error('Error updating task:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Update Failed',
+                text: 'There was an error updating the task status, ' + error.message,
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+    };
 
     return (
-    <div className="h-fit overflow-y-auto overflow-x-hidden p-6 bg-gray-50 space-y-8 md:max-w-6xl">
-      {/* Toolbar */}
-        <div className="sticky top-0 z-10 bg-gray-50 py-4 flex flex-wrap gap-2 justify-center">
-          <div>
-            <button onClick={() => setShowCreateForm(!showCreateForm)} className="btn-primary">
-                {showCreateForm ? 'Hide' : 'Create Task'}
-            </button>
-          </div>
-            <div>
-            <button onClick={() => setShowAssignForm(!showAssignForm)} className="btn-secondary">
-                {showAssignForm ? 'Hide' : 'Assign Task'}
-            </button>
-             {/* Assign Task Form */}
+        <div className="max-w-7xl mx-auto p-4 space-y-8">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2"><ClipboardList size={24} />Task Management</h1>
+                    <p className="text-gray-600">Create, assign, and manage all tasks and teams.</p>
+                </div>
+                <div className="text-right">
+                    <p className="text-sm text-gray-500">Today</p>
+                    <p className="text-lg font-semibold text-gray-900">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                </div>
+            </div>
+            {/* Toolbar */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-wrap gap-4 justify-center mb-4">
+                <button onClick={() => setShowCreateForm(!showCreateForm)} className="btn-primary flex items-center gap-2"><Briefcase size={18} />{showCreateForm ? 'Hide' : 'Create Task'}</button>
+                <button onClick={() => setShowAssignForm(!showAssignForm)} className="btn-secondary flex items-center gap-2"><UserPlus size={18} />{showAssignForm ? 'Hide' : 'Assign Task'}</button>
+                <button onClick={() => setShowTotalTasks(!showTotalTasks)} className="btn-gray">{showTotalTasks ? 'Hide' : 'All Tasks'}</button>
+                <button onClick={() => setShowCompletedTasks(!showCompletedTasks)} className="btn-green">{showCompletedTasks ? 'Hide' : 'Completed Tasks'}</button>
+                <button onClick={() => setShowPendingTasks(!showPendingTasks)} className="btn-yellow">{showPendingTasks ? 'Hide' : 'Pending Tasks'}</button>
+            </div>
+            {/* Forms */}
+            {showCreateForm && (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-4">
+                    <CreateTaskForm
+                        taskForm={taskForm}
+                        handleTaskChange={handleTaskChange}
+                        createTask={createTask}
+                        ownerName={ownerName}
+                    />
+                </div>
+            )}
             {showAssignForm && (
-              <AssignTaskForm
-                assignedTask={assignedTask}
-                handleAssignChange={handleAssignChange}
-                assignTask={assignTask}
-                tasks={tasks}
-                employees={employees}
-              />
-            )}</div>
-            <div>
-            <button onClick={() => setShowTotalTasks(!showTotalTasks)} className="btn-gray">
-                {showTotalTasks ? 'Hide' : 'All Tasks'}
-            </button>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-4">
+                    <AssignTaskForm
+                        assignedTask={assignedTask}
+                        handleAssignChange={handleAssignChange}
+                        assignTask={assignTask}
+                        tasks={tasks}
+                        employees={employees}
+                    />
+                </div>
+            )}
+            {/* Task Lists */}
             {showTotalTasks && (
-                <TaskList title="All Tasks" tasks={tasks} />
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-4">
+                    <TaskList title="All Tasks" tasks={tasks} />
+                </div>
             )}
-            </div>
-            <div>
-            <button onClick={() => setShowCompletedTasks(!showCompletedTasks)} className="btn-green">
-                {showCompletedTasks ? 'Hide' : 'Completed Tasks'}
-            </button>
             {showCompletedTasks && (
-                <TaskList title="Completed Tasks" tasks={tasks.filter(t => t.status === 'COMPLETED')} />
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-4">
+                    <TaskList title="Completed Tasks" tasks={tasks.filter(t => t.status === 'COMPLETED')} />
+                </div>
             )}
-            </div>
-            <div>
-            <button onClick={() => setShowPendingTasks(!showPendingTasks)} className="btn-yellow">
-                {showPendingTasks ? 'Hide' : 'Pending Tasks'}
-            </button>
             {showPendingTasks && (
-                <TaskList title="Pending Tasks" tasks={tasks.filter(t => t.status === 'PENDING')} />
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-4">
+                    <TaskList title="Pending Tasks" tasks={tasks.filter(t => t.status === 'PENDING')} />
+                </div>
             )}
+            {/* Create and Assign Teams Row */}
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    
+                    <CreateTeam tasks={tasks} setTasks={setTasks} />
+                </div>
+            </div>
+            {/* All Tasks Table */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <TaskTable tasks={tasks} markTaskCompleted={markTaskCompleted} />
+            </div>
+            {/* Team Task Details Table (now only below All Tasks Table) */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <TeamTaskTable teams={teams} />
             </div>
         </div>
-        <CreateTeam tasks={tasks} setTasks={setTasks} />
-          <div className="overflow-x-auto overflow-y-auto max-h-[500px] max-md:max-w-[300px]">
-            <TaskTable tasks={tasks} markTaskCompleted={markTaskCompleted} />
-          </div>
-      {/* Create Task Form */}
-        {showCreateForm && (
-        <div className="bg-white shadow-lg rounded-2xl p-6 border border-gray-100">
-            <div className="flex items-center mb-6 gap-2">
-            <ClipboardList className="text-blue-600" />
-            <h2 className="text-2xl font-semibold">Create a Task</h2>
-            </div>
-            <form onSubmit={createTask} className="grid gap-6 grid-cols-1 md:grid-cols-2">
-            
-            {/* Task Creator - Owner (read-only or hidden input if just for ID) */}
-            <div>
-                <label className="block text-sm font-medium mb-1">Task Creator</label>
-                <input
-                  type="text"
-                  name="owner"
-                  className="w-full border border-gray-300 rounded-lg p-2 bg-gray-100 text-gray-700"
-                  value={ownerName}
-                  readOnly
-                />
-            </div>
-
-            {/* Task Name */}
-            <div>
-                <label className="block text-sm font-medium mb-1">Task Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={taskForm.name}
-                  onChange={handleTaskChange}
-                  required
-                />
-            </div>
-
-            {/* Start Date */}
-            <div>
-                <label className="block text-sm font-medium mb-1">Start Date</label>
-                <input
-                  type="date"
-                  name="startDate"
-                  className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={taskForm.startDate}
-                  onChange={handleTaskChange}
-                  required
-                />
-            </div>
-
-            {/* Due Date */}
-            <div>
-                <label className="block text-sm font-medium mb-1">Due Date</label>
-                <input
-                type="date"
-                name="dueDate"
-                className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={taskForm.dueDate}
-                onChange={handleTaskChange}
-                required
-                />
-            </div>
-
-            {/* Description */}
-            <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-1">Description</label>
-                <textarea
-                name="desc"
-                className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows="3"
-                value={taskForm.desc}
-                onChange={handleTaskChange}
-                />
-            </div>
-
-            {/* Priority */}
-            <div>
-                <label className="block text-sm font-medium mb-1">Priority</label>
-                <select
-                name="priority"
-                className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={taskForm.priority}
-                onChange={handleTaskChange}
-                >
-                <option value="HIGH">High</option>
-                <option value="MEDIUM">Medium</option>
-                <option value="LOW">Low</option>
-                </select>
-            </div>
-
-            {/* Reminder */}
-            <div>
-                <label className="block text-sm font-medium mb-1">Reminder</label>
-                <input
-                type="datetime-local"
-                name="reminder"
-                className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={taskForm.reminder}
-                onChange={handleTaskChange}
-                />
-            </div>
-
-            {/* Submit Button */}
-            <div className="col-span-1 md:col-span-2">
-                <button
-                type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 transition-all text-white font-semibold py-2 px-4 rounded-lg"
-                >
-                Create Task
-                </button>
-            </div>
-            </form>
-        </div>
-        )}
-</div>
-);
+    );
 };
 
 export default TaskPage;

@@ -6,6 +6,7 @@ import Employee from "./pages/admin/Employee.jsx";
 import Attendance from "./pages/admin/Attendance.jsx";
 import Leave from "./pages/admin/Leave.jsx";
 import Timesheet from "./pages/admin/Timesheet.jsx";
+import AdminReportPage from "./pages/admin/AdminReportPage.jsx";
 import Login from "./pages/login/Login.jsx";
 import Onboarding from "./pages/admin/onboarding/Onboarding.jsx";
 import Files from "./pages/admin/onboarding/Files.jsx";
@@ -17,6 +18,7 @@ import EmpHome from "./pages/employee/EmpHome.jsx";
 import EmpAttendance from "./pages/employee/EmpAttendance.jsx";
 import EmpLeave from "./pages/employee/EmpLeave.jsx";
 import EmpTimesheet from "./pages/employee/EmpTimesheet.jsx";
+import EmpReport from "./pages/employee/EmpReport.jsx";
 
 function App() {
     const router = createBrowserRouter([
@@ -36,8 +38,9 @@ function App() {
                 { path: "attendance", element: <Attendance /> },
                 { path: "leave", element: <Leave /> },
                 { path: "timesheet", element: <Timesheet /> },
+                { path: "reports", element: <AdminReportPage /> },
                 { path: "onboarding", element: <Onboarding /> },
-                { path: "onboarding/files", element: <Files /> },
+                { path: "onboarding-files", element: <Files /> },
                 { path: "tasks", element: <TaskPage /> },
             ],
         },
@@ -52,6 +55,7 @@ function App() {
                 { path: "leave", element: <EmpLeave /> },
                 { path: "timesheet", element: <EmpTimesheet /> },
                 { path: "tasks", element: <EmpTask /> },
+                { path: "report", element: <EmpReport /> },
             ],
         },
         // Candidate document upload route

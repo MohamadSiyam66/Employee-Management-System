@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { Users } from 'lucide-react';
 
 const CreateTeam = ({ tasks, setTasks }) => {
   const [teamForm, setTeamForm] = useState({
@@ -50,7 +51,7 @@ const CreateTeam = ({ tasks, setTasks }) => {
         members: teamForm.memberIds.map(id => ({ empId: id }))
       };
 
-      await axios.post('http://localhost:8080/api/teams/create', teamPayload);
+      await axios.post('http://localhost:8080/api/team/create', teamPayload);
 
       Swal.fire({
         icon: 'success',
@@ -83,6 +84,15 @@ const CreateTeam = ({ tasks, setTasks }) => {
       // Get the team lead ID from the selected team
       const selectedTeam = teams.find(team => team.id === parseInt(assignForm.teamId));
       const teamLeadId = selectedTeam?.teamLead?.empId;
+      
+      // assign team lead to the task
+      if (teamLeadId) {
+        await axios.put(`http://localhost:8080/api/task/update/${assignForm.taskId}`, {
+              assignedToId: teamLeadId
+          });
+      }else{
+        throw new Error('Team lead not found for the selected team');
+      }
 
       await axios.post('http://localhost:8080/api/notifications/send', {
         recipientId: teamLeadId,
@@ -118,7 +128,7 @@ const CreateTeam = ({ tasks, setTasks }) => {
     <div className="space-y-8 flex flex-row flex-wrap justify-center items-start gap-10">
       {/* Create Team */}
       <div className="bg-white shadow-lg rounded-2xl p-6 border border-gray-100">
-        <h2 className="text-2xl font-semibold mb-4">Create a Team</h2>
+        <div className="flex items-center gap-3 mb-2"><Users size={26} className="text-blue-600" /><span className="font-bold text-2xl text-blue-700">Create Team</span></div>
         <form onSubmit={createTeam} className="grid gap-6 md:grid-cols-2">
           <div>
             <label className="block text-sm font-medium mb-1">Team Name</label>
@@ -151,7 +161,7 @@ const CreateTeam = ({ tasks, setTasks }) => {
 
       {/* Assign Task to Team */}
       <div className="bg-white shadow-lg rounded-2xl p-6 border border-gray-100">
-        <h2 className="text-2xl font-semibold mb-4">Assign Task to a Team</h2>
+        <div className="flex items-center gap-3 mb-2"><Users size={26} className="text-blue-600" /><span className="font-bold text-2xl text-blue-700">Assign Task to Team</span></div>
         <form onSubmit={assignTaskToTeam} className="grid gap-6 md:grid-cols-2">
           <div>
             <label className="block text-sm font-medium mb-1">Select Task</label>

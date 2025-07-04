@@ -1,9 +1,10 @@
 import React from 'react';
+import { Briefcase } from 'lucide-react';
 
 const TaskTable = ({ tasks, markTaskCompleted }) => {
   return (
-    <div className="bg-white shadow-lg rounded-2xl p-4 border border-gray-100">
-      <h2 className="text-2xl font-semibold mb-4">All Task Details</h2>
+    <>
+      <div className="flex items-center gap-3 mb-2"><Briefcase size={26} className="text-green-600" /><span className="font-bold text-2xl text-green-700">All Tasks</span></div>
       <div className="overflow-x-auto overflow-y-auto max-h-[500px] max-md:max-w-[300px]">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -58,7 +59,7 @@ const TaskTable = ({ tasks, markTaskCompleted }) => {
           </tbody>
         </table>
       </div>
-    </div>
+    </>
   );
 };
 

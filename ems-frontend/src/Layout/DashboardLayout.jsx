@@ -11,12 +11,14 @@ const DashboardLayout = () => {
     };
 
     return (
-        <div className=" bg-gray-100">
+        <div className="min-h-screen bg-gray-50">
             <Header onMenuClick={toggleSidebar} />
-            <div className="flex">
+            <div className="flex h-screen pt-16">
                 <Sidebar isOpen={isSidebarOpen} onClose={() => setSidebarOpen(false)} />
-                <main className="flex-1 p-4 mt-2 md:mt-0">
-                    <Outlet />
+                <main className="flex-1 overflow-auto p-6 transition-all duration-300">
+                    <div className="max-w-7xl mx-auto">
+                        <Outlet />
+                    </div>
                 </main>
             </div>
         </div>

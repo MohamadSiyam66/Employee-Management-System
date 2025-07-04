@@ -29,7 +29,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             {/* Mobile Overlay */}
             {isOpen && (
                 <div 
-                    className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+                    className="fixed inset-0 bg-transparent bg-opacity-50 z-40 md:hidden"
                     onClick={onClose}
                 />
             )}
@@ -359,7 +359,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                 </nav>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-slate-700">
+                <div className="md:hidden p-4 border-t border-slate-700">
                     <button
                         onClick={handleLogout}
                         className="flex items-center space-x-3 w-full px-4 py-3 text-slate-300 hover:bg-red-600 hover:text-white rounded-lg transition-all duration-200 group"

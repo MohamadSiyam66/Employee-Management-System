@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Bell, Menu, X } from "lucide-react";
+import { Bell, Menu, X, LogOut } from "lucide-react";
+import BASE_URL from "../api";
 
 const Header = ({ onMenuClick }) => {
     const navigate = useNavigate();
@@ -21,7 +22,7 @@ const Header = ({ onMenuClick }) => {
 
     const fetchNotifications = async (id) => {
         try {
-            const res = await axios.get(`http://localhost:8080/api/notifications/user/${id}`);
+            const res = await axios.get(`${BASE_URL}/api/notifications/user/${id}`);
             setNotifications(res.data || []);
         } catch (err) {
             console.error("Failed to fetch notifications:", err);
@@ -30,7 +31,7 @@ const Header = ({ onMenuClick }) => {
 
     const handleMarkAllAsRead = async () => {
         try {
-            await axios.put(`http://localhost:8080/api/notifications/mark-all-read/${empId}`);
+            await axios.put(`${BASE_URL}/api/notifications/mark-all-read/${empId}`);
             fetchNotifications(empId);
         } catch (err) {
             console.error("Error marking notifications as read:", err);
@@ -44,7 +45,7 @@ const Header = ({ onMenuClick }) => {
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-            <div className="flex items-center justify-between px-4 py-3">
+            <div className="flex items-center justify-between px-4 py-2">
                 {/* Left section */}
                 <div className="flex items-center gap-4">
                     <button 
@@ -136,9 +137,10 @@ const Header = ({ onMenuClick }) => {
                     {/* Logout button */}
                     <button
                         onClick={handleLogout}
-                        className="hidden md:flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors font-medium"
+                        className="hidden md:flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-600 hover:text-white rounded-lg transition-all duration-200 group"
                     >
-                        <span>Logout</span>
+                        <LogOut size={20} className="group-hover:scale-110 transition-transform" />
+                        <span className="font-medium">Logout</span>
                     </button>
                 </div>
             </div>

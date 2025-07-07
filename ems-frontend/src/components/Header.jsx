@@ -68,7 +68,7 @@ const Header = ({ onMenuClick }) => {
                 {/* Right section */}
                 <div className="flex items-center gap-4">
                     {/* User info */}
-                    <div className="hidden md:flex items-center gap-3 text-sm text-gray-600">
+                    <div className="hidden md:flex items-center gap-3 text-sm font-bold text-gray-600">
                         <span>Welcome, {userName}</span>
                     </div>
 

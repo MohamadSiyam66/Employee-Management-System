@@ -21,13 +21,9 @@ public class CandidateDocument {
 
     private String name;
     private String email;
-    private String phone;
-
     private Date joiningDate;
-
     private String ndaFilePath;
     private String uniIdFilePath;
     private String requestLetterFilePath;
-
     private LocalDateTime uploadedAt = LocalDateTime.now();
 }

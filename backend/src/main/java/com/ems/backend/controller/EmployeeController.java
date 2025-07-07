@@ -1,7 +1,6 @@
 package com.ems.backend.controller;
 
 import com.ems.backend.entity.Employee;
-import com.ems.backend.repository.EmployeeRepository;
 import com.ems.backend.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +15,6 @@ import java.util.Optional;
 public class EmployeeController {
 
     private final EmployeeService employeeService;
-    private final EmployeeRepository employeeRepository;
 
     @GetMapping("employees")
     public List<Employee> getAllEmployees() {

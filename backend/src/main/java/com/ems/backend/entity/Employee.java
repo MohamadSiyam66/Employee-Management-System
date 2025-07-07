@@ -3,8 +3,10 @@ package com.ems.backend.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "employee")
@@ -45,6 +47,10 @@ public class Employee {
 
     @Column(length = 100)
     private String designation;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
     public enum Role {
         ADMIN,

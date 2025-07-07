@@ -1,4 +1,6 @@
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import DashboardLayout from "./Layout/DashboardLayout.jsx";
 import Home from "./pages/admin/Home.jsx";
@@ -9,16 +11,17 @@ import Timesheet from "./pages/admin/Timesheet.jsx";
 import AdminReportPage from "./pages/admin/AdminReportPage.jsx";
 import Login from "./pages/login/Login.jsx";
 import Onboarding from "./pages/admin/onboarding/Onboarding.jsx";
+import AdminSettings from "./pages/admin/Settings.jsx";
 import Files from "./pages/admin/onboarding/Files.jsx";
-import UploadPage from "./pages/candidate/uploadPage.jsx";
 import TaskPage from "./pages/admin/tasks/TaskPage.jsx";
 import EmpTask from "./pages/employee/tasks/EmpTask.jsx";
-
+import UploadPage from "./pages/candidate/UploadPage.jsx";
 import EmpHome from "./pages/employee/EmpHome.jsx";
 import EmpAttendance from "./pages/employee/EmpAttendance.jsx";
 import EmpLeave from "./pages/employee/EmpLeave.jsx";
 import EmpTimesheet from "./pages/employee/EmpTimesheet.jsx";
 import EmpReport from "./pages/employee/EmpReport.jsx";
+import Settings from "./pages/employee/Settings.jsx";
 
 function App() {
     const router = createBrowserRouter([
@@ -42,6 +45,7 @@ function App() {
                 { path: "onboarding", element: <Onboarding /> },
                 { path: "onboarding-files", element: <Files /> },
                 { path: "tasks", element: <TaskPage /> },
+                { path: "settings", element: <AdminSettings /> },
             ],
         },
         // Employee routes
@@ -56,6 +60,7 @@ function App() {
                 { path: "timesheet", element: <EmpTimesheet /> },
                 { path: "tasks", element: <EmpTask /> },
                 { path: "report", element: <EmpReport /> },
+                { path: "settings", element: <Settings /> },
             ],
         },
         // Candidate document upload route
@@ -65,7 +70,23 @@ function App() {
         }
     ]);
 
-    return <RouterProvider router={router} />;
+    return (
+        <>
+            <RouterProvider router={router} />
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
+        </>
+    );
 }
 
 export default App;

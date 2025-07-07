@@ -4,10 +4,15 @@ import axios from 'axios'
 import BASE_URL from './../../api';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Eye, EyeOff } from 'lucide-react';
+import CustomTooltip from '../../components/CustomTooltip';
 
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showEmailTooltip, setShowEmailTooltip] = useState(false);
+    const [showPasswordTooltip, setShowPasswordTooltip] = useState(false);
     const navigate = useNavigate();
     const [error, setError] = useState('');
 
@@ -106,23 +111,31 @@ function Login() {
                         <label htmlFor="email" className="block text-gray-700 font-semibold mb-3 text-sm">
                             Email Address
                         </label>
-                        <div className="relative">
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                placeholder="Enter your email"
-                                value={email}
-                                onChange={e => setEmail(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm"
-                                required
-                            />
-                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                                </svg>
+                        <CustomTooltip 
+                            content="Use your @rubaai.net email address"
+                            isVisible={showEmailTooltip && !email.endsWith('@rubaai.net')}
+                            position="top"
+                        >
+                            <div className="relative">
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    placeholder="Enter your email"
+                                    value={email}
+                                    onChange={e => setEmail(e.target.value)}
+                                    onMouseEnter={() => !email.endsWith('@rubaai.net') && setShowEmailTooltip(true)}
+                                    onMouseLeave={() => setShowEmailTooltip(false)}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm hover:border-blue-400"
+                                    required
+                                />
+                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                                    </svg>
+                                </div>
                             </div>
-                        </div>
+                        </CustomTooltip>
                     </div>
 
                     {/* Password Field */}
@@ -130,23 +143,37 @@ function Login() {
                         <label htmlFor="password" className="block text-gray-700 font-semibold mb-3 text-sm">
                             Password
                         </label>
-                        <div className="relative">
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                placeholder="Enter your password"
-                                value={password}
-                                onChange={e => setPassword(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm"
-                                required
-                            />
-                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                </svg>
+                        <CustomTooltip 
+                            content="Enter your secure password."
+                            isVisible={showPasswordTooltip}
+                            position="top"
+                        >
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    id="password"
+                                    name="password"
+                                    placeholder="Enter your password"
+                                    value={password}
+                                    onChange={e => setPassword(e.target.value)}
+                                    onMouseEnter={() => setShowPasswordTooltip(true)}
+                                    onMouseLeave={() => setShowPasswordTooltip(false)}
+                                    className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm hover:border-blue-400"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-gray-600 transition-colors"
+                                >
+                                    {showPassword ? (
+                                        <EyeOff size={20} className="text-gray-400 hover:text-gray-600" />
+                                    ) : (
+                                        <Eye size={20} className="text-gray-400 hover:text-gray-600" />
+                                    )}
+                                </button>
                             </div>
-                        </div>
+                        </CustomTooltip>
                     </div>
 
                     {/* Submit Button */}

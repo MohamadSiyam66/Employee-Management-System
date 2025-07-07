@@ -247,6 +247,23 @@ const Sidebar = ({ isOpen, onClose }) => {
                                         <span className="font-medium">Reports</span>
                                     </NavLink>
                                 </li>
+
+                                {/* Settings */}
+                                <li>
+                                    <NavLink 
+                                        to="/admin/settings" 
+                                        className={({ isActive }) => `
+                                            flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 group
+                                            ${isActive 
+                                                ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg' 
+                                                : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                                            }
+                                        `}
+                                    >
+                                        <Settings size={20} className="group-hover:scale-110 transition-transform" />
+                                        <span className="font-medium">Settings</span>
+                                    </NavLink>
+                                </li>
                             </>
                         )}
 
@@ -351,6 +368,23 @@ const Sidebar = ({ isOpen, onClose }) => {
                                     >
                                         <BarChart3 size={20} className="group-hover:scale-110 transition-transform" />
                                         <span className="font-medium">My Reports</span>
+                                    </NavLink>
+                                </li>
+
+                                {/* Settings */}
+                                <li>
+                                    <NavLink 
+                                        to="/employee/settings" 
+                                        className={({ isActive }) => `
+                                            flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 group
+                                            ${isActive 
+                                                ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg' 
+                                                : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                                            }
+                                        `}
+                                    >
+                                        <Settings size={20} className="group-hover:scale-110 transition-transform" />
+                                        <span className="font-medium">Settings</span>
                                     </NavLink>
                                 </li>
                             </>

@@ -19,10 +19,12 @@ const EmpTimesheet = () => {
     const [loginTime, setLoginTime] = useState(null); // startTime from today's timesheet
     const [updateDisabled, setUpdateDisabled] = useState(false);
     const [allDisabled, setAllDisabled] = useState(false); // disable all after logout
+    const [todayAttendance, setTodayAttendance] = useState(null); // today's attendance status
 
     useEffect(() => {
         fetchTimesheets();
         checkLoggedInToday();
+        fetchTodayAttendance();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -63,6 +65,18 @@ const EmpTimesheet = () => {
         }
     };
 
+    // Fetch today's attendance status
+    const fetchTodayAttendance = async () => {
+        try {
+            const res = await axios.get(`${BASE_URL}/api/attendance/attendances`);
+            const today = getSLDate();
+            const todayAtt = res.data.find(att => String(att.empId) === String(empId) && att.date === today);
+            setTodayAttendance(todayAtt ? todayAtt.status : null);
+        } catch(err) {
+            toast.error("Failed to fetch attendance", err);
+        }
+    };
+
     const handleLogIn = async () => {
         const today = getSLDate();
         const startTime = getSLTime(); // 'HH:mm'
@@ -86,24 +100,40 @@ const EmpTimesheet = () => {
     
     // Button handlers
     const handleLunchBreakStart = () => {
+        if (!loginTime) {
+            toast.error('Please mark login first', { style: { background: '#ef4444', color: '#fff' } });
+            return;
+        }
         if (!lunchBreakStart) {
             setLunchBreakStart(getSLTime());
             toast.info('Lunch break started!', { style: { background: '#2563eb', color: '#fff' } });
         }
     };
     const handleLunchBreakEnd = () => {
+        if (!loginTime) {
+            toast.error('Please mark login first', { style: { background: '#ef4444', color: '#fff' } });
+            return;
+        }
         if (!lunchBreakEnd) {
             setLunchBreakEnd(getSLTime());
             toast.info('Lunch break ended!', { style: { background: '#2563eb', color: '#fff' } });
         }
     };
     const handleOut = () => {
+        if (!loginTime) {
+            toast.error('Please mark login first', { style: { background: '#ef4444', color: '#fff' } });
+            return;
+        }
         if (!currentOut) {
             setCurrentOut(getSLTime());
             toast.warning('Marked as Out!', { style: { background: '#f59e42', color: '#fff' } });
         }
     };
     const handleIn = () => {
+        if (!loginTime) {
+            toast.error('Please mark login first', { style: { background: '#ef4444', color: '#fff' } });
+            return;
+        }
         if (currentOut) {
             setOutInPairs([...outInPairs, { out: currentOut, in: getSLTime() }]);
             setCurrentOut(null);
@@ -114,9 +144,18 @@ const EmpTimesheet = () => {
         if (!loginTime || loggedOut) {
             if (loggedOut) {
                 toast.info('You have already logged out today', { style: { background: '#fbbf24', color: '#fff' } });
+            } else if (!loginTime) {
+                toast.error('Please mark login first', { style: { background: '#ef4444', color: '#fff' } });
             }
             return;
         }
+        
+        // Check if work summary is filled
+        if (!workSummary.trim()) {
+            toast.error('Please fill the work summary before logging out', { style: { background: '#ef4444', color: '#fff' } });
+            return;
+        }
+        
         const endTime = getSLTime();
         setLoggedOut(endTime);
         setUpdateDisabled(true);
@@ -211,8 +250,40 @@ const EmpTimesheet = () => {
             </div>
             {/* Timesheet Actions Grid */}
             <ToastContainer position="top-center" autoClose={2000} hideProgressBar={false} newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover />
+            
+            {/* Attendance Check Message */}
+            {todayAttendance === null && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                            <Clock size={20} className="text-yellow-600" />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-semibold text-yellow-800">Attendance Required</h3>
+                            <p className="text-yellow-700">Please mark your attendance to mark timesheet</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
+            {todayAttendance === 'ABSENT' && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                            <XCircle size={20} className="text-red-600" />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-semibold text-red-800">Cannot Mark Timesheet</h3>
+                            <p className="text-red-700">You are absent today, you cannot mark timesheet</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                {todayAttendance === 'PRESENT' ? (
+                    <>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4">
                     <button
                         onClick={handleLogIn}
                         className={`flex items-center justify-center gap-2 py-2 rounded transition text-white font-semibold text-base 
@@ -287,6 +358,23 @@ const EmpTimesheet = () => {
                                 <li key={idx}>Out: {pair.out}, In: {pair.in}</li>
                             ))}
                         </ul>
+                    </div>
+                )}
+                    </>
+                ) : (
+                    <div className="text-center py-8">
+                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Clock size={24} className="text-gray-400" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-600 mb-2">
+                            {todayAttendance === null ? 'Attendance Required' : 'Cannot Mark Timesheet'}
+                        </h3>
+                        <p className="text-gray-500">
+                            {todayAttendance === null 
+                                ? 'Please mark your attendance as "Present" to access timesheet features.' 
+                                : 'You are marked as absent today. Timesheet features are not available.'
+                            }
+                        </p>
                     </div>
                 )}
             </div>

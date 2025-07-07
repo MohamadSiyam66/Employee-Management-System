@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import BASE_URL from "../../api";
-import { Download, RefreshCw } from "lucide-react";
+import { Download, RefreshCw, Eye, X } from "lucide-react";
 
 const Timesheet = () => {
     const [timesheets, setTimesheets] = useState([]);
@@ -9,6 +9,8 @@ const Timesheet = () => {
     const [selectedDate, setSelectedDate] = useState("");
     const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [showSummaryPopup, setShowSummaryPopup] = useState(false);
+    const [selectedTimesheet, setSelectedTimesheet] = useState(null);
 
     useEffect(() => {
         fetchTimesheets();
@@ -65,6 +67,16 @@ const Timesheet = () => {
         setSearchQuery("");
         setSelectedDate("");
         setFilteredTimesheets(timesheets);
+    };
+
+    const openSummaryPopup = (timesheet) => {
+        setSelectedTimesheet(timesheet);
+        setShowSummaryPopup(true);
+    };
+
+    const closeSummaryPopup = () => {
+        setShowSummaryPopup(false);
+        setSelectedTimesheet(null);
     };
 
     // Calculate work hours
@@ -212,7 +224,7 @@ const Timesheet = () => {
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                 Work Hours
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                 Work Summery
                                             </th>
                                         </tr>
@@ -256,10 +268,14 @@ const Timesheet = () => {
                                                         {ts.workHours || calculateWorkHours(ts.outTime || ts.startTime, ts.inTime || ts.endTime)}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-black">
-                                                        {ts.workSummery}
-                                                    </span>
+                                                <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                                    <button
+                                                        onClick={() => openSummaryPopup(ts)}
+                                                        className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors"
+                                                        title="View Work Summary"
+                                                    >
+                                                        <Eye size={20} />
+                                                    </button>
                                                 </td>
                                             </tr>
                                         ))}
@@ -287,6 +303,74 @@ const Timesheet = () => {
                     Showing {filteredTimesheets.length} of {timesheets.length} timesheet records
                 </div>
             </div>
+
+            {/* Work Summary Popup */}
+            {showSummaryPopup && selectedTimesheet && (
+                <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+                            <h2 className="text-xl font-semibold text-gray-900">
+                                Work Summary - {selectedTimesheet.fname} {selectedTimesheet.lname}
+                            </h2>
+                            <button
+                                onClick={closeSummaryPopup}
+                                className="text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        <div className="p-6 space-y-6">
+                            {/* Employee Info */}
+                            <div className="bg-gray-50 rounded-lg p-4">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-3">Employee Information</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <p className="text-sm text-gray-600">Employee Name</p>
+                                        <p className="font-medium text-gray-900">{selectedTimesheet.fname} {selectedTimesheet.lname}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-600">Timesheet ID</p>
+                                        <p className="font-medium text-gray-900">{selectedTimesheet.timesheetId || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-600">Date</p>
+                                        <p className="font-medium text-gray-900">{selectedTimesheet.date || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-600">Work Hours</p>
+                                        <p className="font-medium text-gray-900">{selectedTimesheet.workHours || calculateWorkHours(selectedTimesheet.startTime, selectedTimesheet.endTime)}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Work Summary */}
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-3">Work Summary</h3>
+                                {selectedTimesheet.workSummery ? (
+                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                        <p className="text-gray-900 whitespace-pre-wrap">{selectedTimesheet.workSummery}</p>
+                                    </div>
+                                ) : (
+                                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                        <p className="text-yellow-800">No work summary provided for this timesheet.</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Close Button */}
+                            <div className="flex justify-end pt-6 border-t border-gray-200">
+                                <button
+                                    onClick={closeSummaryPopup}
+                                    className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

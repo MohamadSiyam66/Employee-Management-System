@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import BASE_URL from "./../../api.js";
 import { 
     Plus, Search, X, Eye, Edit, Trash2, 
     User, Mail, Phone, Calendar,Briefcase,Users,
-    Filter, Download, RefreshCw
+    Filter, Download, RefreshCw, AlertCircle
 } from "lucide-react";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import CustomTooltip from '../../components/CustomTooltip';
+import Swal from 'sweetalert2';
 
 const Employee = () => {
     const [employees, setEmployees] = useState([]);
@@ -31,6 +33,29 @@ const Employee = () => {
 
     const [error, setError] = useState("");
     const [activeTab, setActiveTab] = useState("all");
+    
+    // Validation states
+    const [validationErrors, setValidationErrors] = useState({
+        username: "",
+        password: "",
+        fname: "",
+        lname: "",
+        email: "",
+        phone: "",
+        dob: "",
+        designation: ""
+    });
+    
+    const [showTooltips, setShowTooltips] = useState({
+        username: false,
+        password: false,
+        fname: false,
+        lname: false,
+        email: false,
+        phone: false,
+        dob: false,
+        designation: false
+    });
 
     useEffect(() => {
         fetchEmployees();
@@ -45,13 +70,13 @@ const Employee = () => {
             setFilteredEmployees(response.data);
         } catch (error) {
             toast.error("Error fetching employee data: " + error.message);
-            console.error("Error fetching employee data:", error);
+            //console.error("Error fetching employee data:", error);
         } finally {
             setLoading(false);
         }
     };
 
-    // Enhanced search with real-time filtering
+    // employee search filtering
     const handleSearch = (query) => {
         setSearchQuery(query);
         const filtered = employees.filter(emp =>
@@ -74,8 +99,149 @@ const Employee = () => {
         }
     };
 
+    // Validation functions
+    const validateUsername = (username) => {
+        if (!username) return "";
+        if (!/^[a-zA-Z]+$/.test(username)) {
+            return "Username should only contain letters";
+        }
+        if (employees.some(emp => emp.username === username && emp.empId !== formData.empId)) {
+            return "Username already exists";
+        }
+        return "";
+    };
+
+    const validatePassword = (password) => {
+        if (!password) return "";
+        if (password.length < 8 || password.length > 12) {
+            return "Password must be 8-12 characters long";
+        }
+        if (!/(?=.*[A-Z])/.test(password)) {
+            return "Password must include a capital letter";
+        }
+        if (!/(?=.*[a-z])/.test(password)) {
+            return "Password must include a lowercase letter";
+        }
+        if (!/(?=.*\d)/.test(password)) {
+            return "Password must include a number";
+        }
+        if (!/(?=.*[!@#$%^&*(),.?":{}|<>])/.test(password)) {
+            return "Password must include a symbol";
+        }
+        if (/(.)\1{3,}/.test(password)) {
+            return "Password cannot have sequential numbers like 1111";
+        }
+        const fullName = `${formData.fname} ${formData.lname}`.toLowerCase();
+        if (fullName && password.toLowerCase().includes(fullName.replace(/\s+/g, ''))) {
+            return "Password cannot contain your name";
+        }
+        return "";
+    };
+
+    const validateName = (name, fieldName) => {
+        if (!name) return "";
+        if (!/^[a-zA-Z\s]+$/.test(name)) {
+            return `${fieldName} should only contain letters`;
+        }
+        if (name.trim().length < 3) {
+            return `${fieldName} should contain at least 3 letters`;
+        }
+        return "";
+    };
+
+    const validateEmail = (email) => {
+        if (!email) return "";
+        if (!email.endsWith('@rubaai.net')) {
+            return "Email must end with @rubaai.net";
+        }
+        if (employees.some(emp => emp.email === email && emp.empId !== formData.empId)) {
+            return "Email already exists";
+        }
+        return "";
+    };
+
+    const validatePhone = (phone) => {
+        if (!phone) return "";
+        if (!/^\d+$/.test(phone)) {
+            return "Phone number should only contain numbers";
+        }
+        if (phone.length > 10) {
+            return "Phone number should not exceed 10 digits";
+        }
+        if (employees.some(emp => emp.phone === phone && emp.empId !== formData.empId)) {
+            return "Phone number already exists";
+        }
+        return "";
+    };
+
+    const validateDOB = (dob) => {
+        if (!dob) return "";
+        const selectedDate = new Date(dob);
+        const today = new Date();
+        const minDate = new Date();
+        minDate.setFullYear(today.getFullYear() - 18);
+        
+        if (selectedDate > today) {
+            return "Date of birth cannot be in the future";
+        }
+        if (selectedDate > minDate) {
+            return "Employee must be at least 18 years old";
+        }
+        return "";
+    };
+
+    const validateDesignation = (designation) => {
+        if (!designation) return "";
+        if (!/^[a-zA-Z\s]+$/.test(designation)) {
+            return "Designation should only contain letters";
+        }
+        return "";
+    };
+
     const handleInputChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+        
+        // Validate the field
+        let error = "";
+        switch (name) {
+            case 'username':
+                error = validateUsername(value);
+                break;
+            case 'password':
+                error = validatePassword(value);
+                break;
+            case 'fname':
+                error = validateName(value, 'First name');
+                break;
+            case 'lname':
+                error = validateName(value, 'Last name');
+                break;
+            case 'email':
+                error = validateEmail(value);
+                break;
+            case 'phone':
+                error = validatePhone(value);
+                break;
+            case 'dob':
+                error = validateDOB(value);
+                break;
+            case 'designation':
+                error = validateDesignation(value);
+                break;
+            default:
+                break;
+        }
+        
+        setValidationErrors(prev => ({ ...prev, [name]: error }));
+    };
+
+    const handleFieldFocus = (fieldName) => {
+        setShowTooltips(prev => ({ ...prev, [fieldName]: true }));
+    };
+
+    const handleFieldBlur = (fieldName) => {
+        setShowTooltips(prev => ({ ...prev, [fieldName]: false }));
     };
 
     const openPopup = (mode, data = null) => {
@@ -217,15 +383,23 @@ const Employee = () => {
 
     // Delete employee
     const deleteEmployee = async (id, name) => {
-        const confirmed = window.confirm(`Are you sure you want to delete ${name}? This action cannot be undone.`);
-        if (confirmed) {
+        const result = await Swal.fire({
+            title: `Delete ${name}?`,
+            text: "This action cannot be undone.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!',
+        });
+        if (result.isConfirmed) {
             setLoading(true);
             try {
                 await axios.delete(`${BASE_URL}/api/employee/delete/${id}`);
                 await fetchEmployees();
-                toast.success("Employee deleted successfully!");
+                Swal.fire('Deleted!', 'Employee has been deleted.', 'success');
             } catch (error) {
-                toast.error("Error deleting employee: " + error.message);
+                Swal.fire('Error!', "Error deleting employee: " + error.message, 'error');
             } finally {
                 setLoading(false);
             }
@@ -265,7 +439,7 @@ const Employee = () => {
     return (
         <div className="min-h-screen bg-gray-50 p-6">
             <ToastContainer
-                position="top-right"
+                position="top-center"
                 autoClose={3000}
                 hideProgressBar={false}
                 newestOnTop={false}
@@ -333,8 +507,7 @@ const Employee = () => {
                                     key={tab.id}
                                     onClick={() => filterByRole(tab.id)}
                                     className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                                        activeTab === tab.id
-                                            ? 'bg-blue-600 text-white'
+                                        activeTab === tab.id ? 'bg-blue-600 text-white'
                                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                     }`}
                                 >
@@ -503,36 +676,32 @@ const Employee = () => {
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Username
                                     </label>
-                                    <div className="relative">
-                                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                                        <input
-                                            name="username"
-                                            type="text"
-                                            placeholder="Enter username"
-                                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                            value={formData.username}
-                                            onChange={handleInputChange}
-                                            disabled={popupMode === "view"}
-                                        />
-                                    </div>
+                                    <CustomTooltip 
+                                        content={validationErrors.username}
+                                        isVisible={showTooltips.username && validationErrors.username}
+                                        position="top"
+                                    >
+                                        <div className="relative">
+                                            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                                            <input
+                                                name="username"
+                                                type="text"
+                                                placeholder="Enter username"
+                                                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                                    validationErrors.username ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
+                                                }`}
+                                                value={formData.username}
+                                                onChange={handleInputChange}
+                                                onFocus={() => handleFieldFocus('username')}
+                                                onBlur={() => handleFieldBlur('username')}
+                                                disabled={popupMode === "view"}
+                                            />
+                                            {validationErrors.username && (
+                                                <AlertCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-400" size={16} />
+                                            )}
+                                        </div>
+                                    </CustomTooltip>
                                 </div>
-
-                                {/* Password */}
-                                {popupMode === "add" && (
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Password
-                                        </label>
-                                        <input
-                                            name="password"
-                                            type="password"
-                                            placeholder="Enter password"
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                            value={formData.password}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                )}
 
                                 {/* Role */}
                                 <div>
@@ -556,15 +725,30 @@ const Employee = () => {
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         First Name
                                     </label>
-                                    <input
-                                        name="fname"
-                                        type="text"
-                                        placeholder="Enter first name"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        value={formData.fname}
-                                        onChange={handleInputChange}
-                                        disabled={popupMode === "view"}
-                                    />
+                                    <CustomTooltip 
+                                        content={validationErrors.fname}
+                                        isVisible={showTooltips.fname && validationErrors.fname}
+                                        position="top"
+                                    >
+                                        <div className="relative">
+                                            <input
+                                                name="fname"
+                                                type="text"
+                                                placeholder="Enter first name"
+                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                                    validationErrors.fname ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
+                                                }`}
+                                                value={formData.fname}
+                                                onChange={handleInputChange}
+                                                onFocus={() => handleFieldFocus('fname')}
+                                                onBlur={() => handleFieldBlur('fname')}
+                                                disabled={popupMode === "view"}
+                                            />
+                                            {validationErrors.fname && (
+                                                <AlertCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-400" size={16} />
+                                            )}
+                                        </div>
+                                    </CustomTooltip>
                                 </div>
 
                                 {/* Last Name */}
@@ -572,15 +756,30 @@ const Employee = () => {
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Last Name
                                     </label>
-                                    <input
-                                        name="lname"
-                                        type="text"
-                                        placeholder="Enter last name"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        value={formData.lname}
-                                        onChange={handleInputChange}
-                                        disabled={popupMode === "view"}
-                                    />
+                                    <CustomTooltip 
+                                        content={validationErrors.lname}
+                                        isVisible={showTooltips.lname && validationErrors.lname}
+                                        position="top"
+                                    >
+                                        <div className="relative">
+                                            <input
+                                                name="lname"
+                                                type="text"
+                                                placeholder="Enter last name"
+                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                                    validationErrors.lname ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
+                                                }`}
+                                                value={formData.lname}
+                                                onChange={handleInputChange}
+                                                onFocus={() => handleFieldFocus('lname')}
+                                                onBlur={() => handleFieldBlur('lname')}
+                                                disabled={popupMode === "view"}
+                                            />
+                                            {validationErrors.lname && (
+                                                <AlertCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-400" size={16} />
+                                            )}
+                                        </div>
+                                    </CustomTooltip>
                                 </div>
 
                                 {/* Email */}
@@ -588,37 +787,95 @@ const Employee = () => {
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Email
                                     </label>
-                                    <div className="relative">
-                                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                                        <input
-                                            name="email"
-                                            type="email"
-                                            placeholder="Enter email address"
-                                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                            value={formData.email}
-                                            onChange={handleInputChange}
-                                            disabled={popupMode === "view"}
-                                        />
-                                    </div>
+                                    <CustomTooltip 
+                                        content={validationErrors.email}
+                                        isVisible={showTooltips.email && validationErrors.email}
+                                        position="top"
+                                    >
+                                        <div className="relative">
+                                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                                            <input
+                                                name="email"
+                                                type="email"
+                                                placeholder="Enter email address"
+                                                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                                    validationErrors.email ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
+                                                }`}
+                                                value={formData.email}
+                                                onChange={handleInputChange}
+                                                onFocus={() => handleFieldFocus('email')}
+                                                onBlur={() => handleFieldBlur('email')}
+                                                disabled={popupMode === "view"}
+                                            />
+                                            {validationErrors.email && (
+                                                <AlertCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-400" size={16} />
+                                            )}
+                                        </div>
+                                    </CustomTooltip>
                                 </div>
+
+                                {/* Password */}
+                                {popupMode === "add" && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Password
+                                        </label>
+                                        <CustomTooltip 
+                                            content={validationErrors.password}
+                                            isVisible={showTooltips.password && validationErrors.password}
+                                            position="top"
+                                        >
+                                            <div className="relative">
+                                                <input
+                                                    name="password"
+                                                    type="password"
+                                                    placeholder="Enter password"
+                                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                                        validationErrors.password ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
+                                                    }`}
+                                                    value={formData.password}
+                                                    onChange={handleInputChange}
+                                                    onFocus={() => handleFieldFocus('password')}
+                                                    onBlur={() => handleFieldBlur('password')}
+                                                />
+                                                {validationErrors.password && (
+                                                    <AlertCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-400" size={16} />
+                                                )}
+                                            </div>
+                                        </CustomTooltip>
+                                    </div>
+                                )}
 
                                 {/* Phone */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Phone
                                     </label>
-                                    <div className="relative">
-                                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                                        <input
-                                            name="phone"
-                                            type="tel"
-                                            placeholder="Enter phone number"
-                                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                            value={formData.phone}
-                                            onChange={handleInputChange}
-                                            disabled={popupMode === "view"}
-                                        />
-                                    </div>
+                                    <CustomTooltip 
+                                        content={validationErrors.phone}
+                                        isVisible={showTooltips.phone && validationErrors.phone}
+                                        position="top"
+                                    >
+                                        <div className="relative">
+                                            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                                            <input
+                                                name="phone"
+                                                type="tel"
+                                                placeholder="Enter phone number"
+                                                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                                    validationErrors.phone ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
+                                                }`}
+                                                value={formData.phone}
+                                                onChange={handleInputChange}
+                                                onFocus={() => handleFieldFocus('phone')}
+                                                onBlur={() => handleFieldBlur('phone')}
+                                                disabled={popupMode === "view"}
+                                            />
+                                            {validationErrors.phone && (
+                                                <AlertCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-400" size={16} />
+                                            )}
+                                        </div>
+                                    </CustomTooltip>
                                 </div>
 
                                 {/* Date of Birth */}
@@ -626,17 +883,36 @@ const Employee = () => {
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Date of Birth
                                     </label>
-                                    <div className="relative">
-                                        <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                                        <input
-                                            name="dob"
-                                            type="date"
-                                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                            value={formData.dob}
-                                            onChange={handleInputChange}
-                                            disabled={popupMode === "view"}
-                                        />
-                                    </div>
+                                    <CustomTooltip 
+                                        content={validationErrors.dob}
+                                        isVisible={showTooltips.dob && validationErrors.dob}
+                                        position="top"
+                                    >
+                                        <div className="relative">
+                                            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                                            <input
+                                                name="dob"
+                                                type="date"
+                                                max={(() => {
+                                                    const today = new Date();
+                                                    const minDate = new Date();
+                                                    minDate.setFullYear(today.getFullYear() - 18);
+                                                    return minDate.toISOString().split('T')[0];
+                                                })()}
+                                                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                                    validationErrors.dob ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
+                                                }`}
+                                                value={formData.dob}
+                                                onChange={handleInputChange}
+                                                onFocus={() => handleFieldFocus('dob')}
+                                                onBlur={() => handleFieldBlur('dob')}
+                                                disabled={popupMode === "view"}
+                                            />
+                                            {validationErrors.dob && (
+                                                <AlertCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-400" size={16} />
+                                            )}
+                                        </div>
+                                    </CustomTooltip>
                                 </div>
 
                                 {/* Designation */}
@@ -644,18 +920,31 @@ const Employee = () => {
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Designation
                                     </label>
-                                    <div className="relative">
-                                        <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                                        <input
-                                            name="designation"
-                                            type="text"
-                                            placeholder="Enter designation"
-                                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                            value={formData.designation}
-                                            onChange={handleInputChange}
-                                            disabled={popupMode === "view"}
-                                        />
-                                    </div>
+                                    <CustomTooltip 
+                                        content={validationErrors.designation}
+                                        isVisible={showTooltips.designation && validationErrors.designation}
+                                        position="top"
+                                    >
+                                        <div className="relative">
+                                            <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                                            <input
+                                                name="designation"
+                                                type="text"
+                                                placeholder="Enter designation"
+                                                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                                    validationErrors.designation ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
+                                                }`}
+                                                value={formData.designation}
+                                                onChange={handleInputChange}
+                                                onFocus={() => handleFieldFocus('designation')}
+                                                onBlur={() => handleFieldBlur('designation')}
+                                                disabled={popupMode === "view"}
+                                            />
+                                            {validationErrors.designation && (
+                                                <AlertCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-400" size={16} />
+                                            )}
+                                        </div>
+                                    </CustomTooltip>
                                 </div>
                             </div>
 

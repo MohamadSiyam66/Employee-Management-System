@@ -1,5 +1,7 @@
 import { useState } from "react";
 import emailjs from "@emailjs/browser";
+import { toast } from "react-toastify";
+import CustomTooltip from "../../../components/CustomTooltip";
 
 const SERVICE_ID = "service_v9cefdu";
 const TEMPLATE_ID = "template_a9522to";
@@ -9,58 +11,159 @@ const Onboarding = () => {
     const [form, setForm] = useState({
         name: "", 
         email: "", 
-        phone: "", 
+        subject: "",
         description: "", 
-        googleDriveLink: "", 
-        candidateUploadLink: ""
+        googleFormLink: "", 
+        ndaDocumentLink: "",
     });
     const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState("");
-    const [error, setError] = useState("");
+    const [tooltipStates, setTooltipStates] = useState({
+        name: false,
+        email: false,
+        subject: false,
+        googleFormLink: false,
+        ndaDocumentLink: false,
+        description: false
+    });
 
-    const showMessage = (msg, type = "success") => {
-        setMessage(msg);
-        setTimeout(() => {
-            setMessage("");
-        }, 5000);
+    // Validation functions
+    const validateName = (name) => {
+        const nameRegex = /^[a-zA-Z\s]+$/;
+        return nameRegex.test(name.trim());
+    };
+
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email.trim());
+    };
+        
+    const validateGoogleFormLink = (link) => {
+        return link.trim().length > 0 && link.includes('docs.google.com/forms');
+    };
+
+    const validateNdaDocumentLink = (link) => {
+        return link.trim().length > 0 && (link.includes('drive.google.com') || link.includes('docs.google.com'));
+    };
+
+    const validateForm = () => {
+        const errors = {};
+
+        if (!form.name.trim()) {
+            errors.name = "Full name is required";
+        } else if (!validateName(form.name)) {
+            errors.name = "Full name should only contain letters and spaces";
+        }
+
+        if (!form.email.trim()) {
+            errors.email = "Email is required";
+        } else if (!validateEmail(form.email)) {
+            errors.email = "Please enter a valid email address";
+        }
+
+        if (!form.subject.trim()) {
+            errors.subject = "Subject is required";
+        }
+
+        if (!form.googleFormLink.trim()) {
+            errors.googleFormLink = "Google Form link is required";
+        } else if (!validateGoogleFormLink(form.googleFormLink)) {
+            errors.googleFormLink = "Please enter a valid Google Form link";
+        }
+
+        if (!form.ndaDocumentLink.trim()) {
+            errors.ndaDocumentLink = "NDA document link is required";
+        } else if (!validateNdaDocumentLink(form.ndaDocumentLink)) {
+            errors.ndaDocumentLink = "Please enter a valid Google Drive or Docs link";
+        }
+
+        if (!form.description.trim()) {
+            errors.description = "Description is required";
+        }
+
+        return errors;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        const errors = validateForm();
+        
+        if (Object.keys(errors).length > 0) {
+            toast.error("Please fix the validation errors before submitting.");
+            return;
+        }
+
         setLoading(true);
-        setError("");
 
         try {
             await emailjs.send(SERVICE_ID, TEMPLATE_ID, {
                 name: form.name,
                 email: form.email,
-                google_drive_link: form.googleDriveLink,
-                candidate_upload_link: form.candidateUploadLink,
+                subject: form.subject,
+                google_form_link: form.googleFormLink,
+                nda_document_link: form.ndaDocumentLink,
                 description: form.description,
             }, PUBLIC_KEY);
 
-            showMessage("Candidate submitted successfully! Email notification sent.");
+            toast.success("Candidate submitted successfully! Email notification sent.");
             
             // Reset form
             setForm({
                 name: "", 
                 email: "", 
+                subject: "",
                 phone: "", 
                 description: "", 
-                googleDriveLink: "", 
-                candidateUploadLink: ""
+                googleFormLink: "", 
+                ndaDocumentLink: ""
             });
 
         } catch (error) {
-            console.error("Error during onboarding:", error);
-            setError("Failed to submit candidate. Please try again.");
+            toast.error(`Error during onboarding: ${error}`);
         } finally {
             setLoading(false);
         }
     };
 
     const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        
+        // Special handling for name field - prevent numbers and special characters
+        if (name === 'name') {
+            const filteredValue = value.replace(/[^a-zA-Z\s]/g, '');
+            setForm({ ...form, [name]: filteredValue });
+        } 
+        // Special handling for phone field - allow only numbers for Sri Lanka mobile format
+        else if (name === 'phone') {
+            const filteredValue = value.replace(/[^0-9]/g, '');
+            // Limit to maximum 10 digits
+            const limitedValue = filteredValue.slice(0, 10);
+            setForm({ ...form, [name]: limitedValue });
+        } else {
+            setForm({ ...form, [name]: value });
+        }
+    };
+
+    const handleBlur = (fieldName) => {
+        const errors = validateForm();
+        if (errors[fieldName]) {
+            setTooltipStates(prev => ({
+                ...prev,
+                [fieldName]: true
+            }));
+        } else {
+            setTooltipStates(prev => ({
+                ...prev,
+                [fieldName]: false
+            }));
+        }
+    };
+
+    const handleFocus = (fieldName) => {
+        setTooltipStates(prev => ({
+            ...prev,
+            [fieldName]: false
+        }));
     };
 
     const clearForm = () => {
@@ -69,10 +172,22 @@ const Onboarding = () => {
             email: "", 
             phone: "", 
             description: "", 
-            googleDriveLink: "", 
-            candidateUploadLink: ""
+            googleFormLink: "", 
+            ndaDocumentLink: ""
         });
-        setError("");
+        setTooltipStates({
+            name: false,
+            email: false,
+            subject: false,
+            googleFormLink: false,
+            ndaDocumentLink: false,
+            description: false
+        });
+    };
+
+    const getValidationError = (fieldName) => {
+        const errors = validateForm();
+        return errors[fieldName] || "";
     };
 
     return (
@@ -88,19 +203,6 @@ const Onboarding = () => {
                     </div>
                 </div>
 
-                {/* Success/Error Messages */}
-                {message && (
-                    <div className="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
-                        {message}
-                    </div>
-                )}
-
-                {error && (
-                    <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                        {error}
-                    </div>
-                )}
-
                 {/* Onboarding Form */}
                 <div className="bg-white rounded-lg shadow-md overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-200">
@@ -113,8 +215,13 @@ const Onboarding = () => {
                             {/* Name */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Full Name *
+                                    Name *
                                 </label>
+                                <CustomTooltip 
+                                    content={getValidationError('name')}
+                                    isVisible={tooltipStates.name}
+                                    position="top"
+                                >
                                 <div className="relative">
                                     <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -124,11 +231,14 @@ const Onboarding = () => {
                                         type="text"
                                         value={form.name}
                                         onChange={handleChange}
-                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            onBlur={() => handleBlur('name')}
+                                            onFocus={() => handleFocus('name')}
+                                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         placeholder="Enter candidate's full name"
                                         required
                                     />
                                 </div>
+                                </CustomTooltip>
                             </div>
 
                             {/* Email */}
@@ -136,6 +246,11 @@ const Onboarding = () => {
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Email Address *
                                 </label>
+                                <CustomTooltip 
+                                    content={getValidationError('email')}
+                                    isVisible={tooltipStates.email}
+                                    position="top"
+                                >
                                 <div className="relative">
                                     <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -145,87 +260,124 @@ const Onboarding = () => {
                                         type="email"
                                         value={form.email}
                                         onChange={handleChange}
-                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            onBlur={() => handleBlur('email')}
+                                            onFocus={() => handleFocus('email')}
+                                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         placeholder="candidate@example.com"
                                         required
                                     />
                                 </div>
-                            </div>
-
-                            {/* Phone */}
+                                </CustomTooltip>
+                            </div>  
+                            {/* Subject */} 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Phone Number
+                                    Subject *
                                 </label>
+                                <CustomTooltip 
+                                    content={getValidationError('subject')}
+                                    isVisible={tooltipStates.subject}
+                                    position="top"
+                                >
                                 <div className="relative">
                                     <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     <input
-                                        name="phone"
-                                        type="tel"
-                                        value={form.phone}
+                                        type="text"
+                                        name="subject"
+                                        value={form.subject}
                                         onChange={handleChange}
-                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        placeholder="+1 (555) 123-4567"
+                                            onBlur={() => handleBlur('subject')}
+                                            onFocus={() => handleFocus('subject')}
+                                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        placeholder="Subject"
+                                        required
                                     />
                                 </div>
+                                </CustomTooltip>
                             </div>
-
-                            {/* Google Drive Link */}
+                            {/* Google Form Link */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Google Drive Link
+                                    Google Form Link *
                                 </label>
+                                <CustomTooltip 
+                                    content={getValidationError('googleFormLink')}
+                                    isVisible={tooltipStates.googleFormLink}
+                                    position="top"
+                                >
                                 <div className="relative">
                                     <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                                     </svg>
                                     <input
                                         type="url"
-                                        name="googleDriveLink"
-                                        value={form.googleDriveLink}
+                                        name="googleFormLink"
+                                        value={form.googleFormLink}
                                         onChange={handleChange}
-                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        placeholder="https://drive.google.com/..."
+                                            onBlur={() => handleBlur('googleFormLink')}
+                                            onFocus={() => handleFocus('googleFormLink')}
+                                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        placeholder="https://docs.google.com/forms/...."
+                                        required
                                     />
                                 </div>
+                                </CustomTooltip>
                             </div>
                         </div>
 
-                        {/* Candidate Upload Link */}
+                        {/* NDA Document Link */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Candidate Upload Link
+                                NDA Document Link *
                             </label>
+                            <CustomTooltip 
+                                content={getValidationError('ndaDocumentLink')}
+                                isVisible={tooltipStates.ndaDocumentLink}
+                                position="top"
+                            >
                             <div className="relative">
                                 <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                 </svg>
                                 <input
                                     type="url"
-                                    name="candidateUploadLink"
-                                    value={form.candidateUploadLink}
+                                    name="ndaDocumentLink"
+                                    value={form.ndaDocumentLink}
                                     onChange={handleChange}
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    placeholder="https://example.com/upload-link"
+                                        onBlur={() => handleBlur('ndaDocumentLink')}
+                                        onFocus={() => handleFocus('ndaDocumentLink')}
+                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="https://drive.google.com/file/..."
+                                    required
                                 />
                             </div>
+                            </CustomTooltip>
                         </div>
 
                         {/* Description */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Description
+                                Description *
                             </label>
+                            <CustomTooltip 
+                                content={getValidationError('description')}
+                                isVisible={tooltipStates.description}
+                                position="top"
+                            >
                             <textarea
                                 name="description"
                                 value={form.description}
                                 onChange={handleChange}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    onBlur={() => handleBlur('description')}
+                                    onFocus={() => handleFocus('description')}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 rows="4"
                                 placeholder="Additional notes about the candidate, position, or requirements..."
+                                required
                             ></textarea>
+                            </CustomTooltip>
                         </div>
 
                         {/* Action Buttons */}

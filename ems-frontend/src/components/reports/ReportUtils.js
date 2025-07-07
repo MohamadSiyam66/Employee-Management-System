@@ -208,18 +208,19 @@ export const exportToPDF = (section, data, globalDateFilter) => {
                     `${record.fname || ''} ${record.lname || ''}`.trim() || 'N/A',
                     record.date || 'N/A',
                     record.status || 'N/A',
-                    record.loggedInTime ? new Date(record.loggedInTime).toLocaleTimeString() : 'N/A',
-                    record.loggedOutTime ? new Date(record.loggedOutTime).toLocaleTimeString() : 'N/A'
+                    formatTime(record.loggedInTime),
+                    formatTime(record.loggedOutTime)
                 ]);
                 break;
             case 'timesheet':
-                headers = ['Employee', 'Date', 'Work Hours', 'Start Time', 'End Time'];
+                headers = ['Employee', 'Date', 'Work Hours', 'Start Time', 'End Time', 'Work Summary'];
                 tableData = data.map(record => [
                     `${record.fname || ''} ${record.lname || ''}`.trim() || 'N/A',
                     record.date || 'N/A',
                     record.workHours || 'N/A',
                     record.startTime || 'N/A',
-                    record.endTime || 'N/A'
+                    record.endTime || 'N/A',
+                    record.workSummery || record.workSummary || record.work_summary || record.description || 'N/A'
                 ]);
                 break;
             case 'leave':

@@ -157,15 +157,47 @@ const EmpTask = () => {
               <p><span className="font-semibold">Due Date:</span> {task.dueDate}</p>
               <p><span className="font-semibold">Accepting Status:</span> {task.acceptingStatus}</p>
               <p><span className="font-semibold">Task Status:</span></p>
-              <select
-                className="w-full border rounded px-2 py-1 text-sm mb-2"
-                value={task.status}
-                onChange={(e) => handleStatusChange(task.id, e.target.value)}
-              >
-                <option value="PENDING">PENDING</option>
-                <option value="IN_PROGRESS">IN_PROGRESS</option>
-                <option value="COMPLETED">COMPLETED</option>
-              </select>
+              <div className="flex gap-1 mb-2">
+                <button
+                  onClick={() => handleStatusChange(task.id, 'PENDING')}
+                  disabled={task.acceptingStatus !== 'ACCEPTED'}
+                  className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                    task.acceptingStatus === 'ACCEPTED' && task.status === 'PENDING'
+                      ? 'bg-blue-600 text-white'
+                      : task.acceptingStatus === 'ACCEPTED'
+                      ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  PENDING
+                </button>
+                <button
+                  onClick={() => handleStatusChange(task.id, 'IN_PROGRESS')}
+                  disabled={task.acceptingStatus !== 'ACCEPTED'}
+                  className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                    task.acceptingStatus === 'ACCEPTED' && task.status === 'IN_PROGRESS'
+                      ? 'bg-yellow-600 text-white'
+                      : task.acceptingStatus === 'ACCEPTED'
+                      ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  IN PROGRESS
+                </button>
+                <button
+                  onClick={() => handleStatusChange(task.id, 'COMPLETED')}
+                  disabled={task.acceptingStatus !== 'ACCEPTED'}
+                  className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                    task.acceptingStatus === 'ACCEPTED' && task.status === 'COMPLETED'
+                      ? 'bg-green-600 text-white'
+                      : task.acceptingStatus === 'ACCEPTED'
+                      ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  COMPLETED
+                </button>
+              </div>
               {task.acceptingStatus === 'REJECTED' && (
                 <p className="text-red-700 text-sm italic">
                   <span className="font-semibold">Rejection Reason:</span> {task.rejectingReason || 'No reason provided'}

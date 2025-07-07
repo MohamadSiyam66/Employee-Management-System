@@ -53,13 +53,17 @@ const AdminReportPage = () => {
     // Active tab
     const [activeTab, setActiveTab] = useState('employee');
     
+    // Timesheet popup state
+    const [selectedTimesheet, setSelectedTimesheet] = useState(null);
+    const [showTimesheetPopup, setShowTimesheetPopup] = useState(false);
+    
     // Filter states for each section
     const [filters, setFilters] = useState({
         employee: { designation: '', ageRange: '' },
-        attendance: { date: '', employeeId: '', month: '', year: '' },
+        attendance: { date: '', employeeId: '', month: '', year: '', status: '' },
         timesheet: { date: '', employee: '', month: '', year: '' },
-        leave: { employee: '', date: '', month: '', year: '' },
-        task: { date: '', month: '', year: '' }
+        leave: { employee: '', date: '', month: '', year: '', status: '' },
+        task: { date: '', month: '', year: '', status: '' }
     });
 
     // Fetch all data on component mount
@@ -234,8 +238,8 @@ const AdminReportPage = () => {
                 if (globalDateFilter !== 'all') {
                     const { start, end } = getDateRange(globalDateFilter);
                     data = data.filter(emp => {
-                        // Check for various possible date fields
-                        const dateField = emp.createdAt || emp.joinDate || emp.hireDate || emp.createdDate;
+                        // Use createdAt date field for employee filtering
+                        const dateField = emp.createdAt;
                         if (!dateField) return false; // Exclude if no date field
                         let normalizedDate = dateField;
                         if (typeof dateField === 'string') {
@@ -272,6 +276,9 @@ const AdminReportPage = () => {
                         record.empId?.toString().includes(filters.attendance.employeeId)
                     );
                 }
+                if (filters.attendance.status) {
+                    data = data.filter(record => record.status === filters.attendance.status);
+                }
                 break;
             case 'timesheet':
                 data = filterDataByDateRange(timesheetData, 'date');
@@ -303,6 +310,9 @@ const AdminReportPage = () => {
                         record.employeeName.toLowerCase().includes(filters.leave.employee.toLowerCase())
                     );
                 }
+                if (filters.leave.status) {
+                    data = data.filter(record => record.status === filters.leave.status);
+                }
                 break;
             case 'task':
                 data = filterDataByDateRange(taskData, 'createdAt');
@@ -317,6 +327,9 @@ const AdminReportPage = () => {
                 });
                 if (filters.task.date) {
                     data = data.filter(record => record.createdAt?.split('T')[0] === filters.task.date);
+                }
+                if (filters.task.status) {
+                    data = data.filter(record => record.status === filters.task.status);
                 }
                 break;
             default:
@@ -389,6 +402,17 @@ const AdminReportPage = () => {
         return performanceData;
     };
 
+    // Handle timesheet view popup
+    const handleViewTimesheet = (timesheet) => {
+        setSelectedTimesheet(timesheet);
+        setShowTimesheetPopup(true);
+    };
+
+    const closeTimesheetPopup = () => {
+        setSelectedTimesheet(null);
+        setShowTimesheetPopup(false);
+    };
+
     // Export functions
     const exportToExcel = (section, data) => {
         if (!data || data.length === 0) {
@@ -412,8 +436,8 @@ const AdminReportPage = () => {
                     'Employee': `${record.fname || ''} ${record.lname || ''}`.trim() || 'N/A',
                     'Date': record.date || 'N/A',
                     'Status': record.status || 'N/A',
-                    'Check In': record.loggedInTime ? new Date(record.loggedInTime).toLocaleTimeString() : 'N/A',
-                    'Check Out': record.loggedOutTime ? new Date(record.loggedOutTime).toLocaleTimeString() : 'N/A'
+                    'Check In': record.loggedInTime || 'N/A',
+                    'Check Out': record.loggedOutTime || 'N/A'
                 }));
                 break;
             case 'timesheet':
@@ -422,7 +446,8 @@ const AdminReportPage = () => {
                     'Date': record.date || 'N/A',
                     'Work Hours': record.workHours || 'N/A',
                     'Start Time': record.startTime || 'N/A',
-                    'End Time': record.endTime || 'N/A'
+                    'End Time': record.endTime || 'N/A',
+                    'Work Summary': record.workSummery || record.workSummary || record.work_summary || record.description || 'N/A'
                 }));
                 break;
             case 'leave':
@@ -567,14 +592,23 @@ const AdminReportPage = () => {
                             onExportExcel={() => exportToExcel('attendance', getFilteredData('attendance'))}
                             filterConfig={{
                                 date: { type: 'date', placeholder: 'Filter by date' },
-                                employeeId: { type: 'text', placeholder: 'Filter by employee ID' }
+                                employeeId: { type: 'text', placeholder: 'Filter by employee ID' },
+                                status: { 
+                                    type: 'select', 
+                                    label: 'Status',
+                                    options: [
+                                        { value: '', label: 'All Status' },
+                                        { value: 'PRESENT', label: 'Present' },
+                                        { value: 'ABSENT', label: 'Absent' }
+                                    ]
+                                }
                             }}
                             columns={[
                                 { key: 'employee', label: 'Employee', render: (record) => `${record.fname} ${record.lname}` },
                                 { key: 'date', label: 'Date' },
                                 { key: 'status', label: 'Status' },
-                                { key: 'loggedInTime', label: 'Check In', render: (record) => record.loggedInTime ? new Date(record.loggedInTime).toLocaleTimeString() : 'N/A' },
-                                { key: 'loggedOutTime', label: 'Check Out', render: (record) => record.loggedOutTime ? new Date(record.loggedOutTime).toLocaleTimeString() : 'N/A' }
+                                { key: 'loggedInTime', label: 'Check In', render: (record) => record.loggedInTime || 'N/A' },
+                                { key: 'loggedOutTime', label: 'Check Out', render: (record) => record.loggedOutTime || 'N/A' }
                             ]}
                         />
                     )}
@@ -598,8 +632,19 @@ const AdminReportPage = () => {
                                 { key: 'workHours', label: 'Work Hours' },
                                 { key: 'startTime', label: 'Start Time' },
                                 { key: 'endTime', label: 'End Time' },
-                                { key: 'lunchOutTime', label: 'Lunch Out' },
-                                { key: 'lunchInTime', label: 'Lunch In' }
+                                { key: 'workSummary', label: 'Work Summary', render: (record) => record.workSummery || record.workSummary || record.work_summary || record.description || 'N/A' },
+                                { 
+                                    key: 'actions', 
+                                    label: 'Actions', 
+                                    render: (record) => (
+                                        <button
+                                            onClick={() => handleViewTimesheet(record)}
+                                            className="bg-blue-600 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-700 transition-colors"
+                                        >
+                                            View
+                                        </button>
+                                    )
+                                }
                             ]}
                         />
                     )}
@@ -615,7 +660,17 @@ const AdminReportPage = () => {
                             onExportExcel={() => exportToExcel('leave', getFilteredData('leave'))}
                             filterConfig={{
                                 date: { type: 'date', placeholder: 'Filter by start date' },
-                                employee: { type: 'text', placeholder: 'Filter by employee name' }
+                                employee: { type: 'text', placeholder: 'Filter by employee name' },
+                                status: { 
+                                    type: 'select', 
+                                    label: 'Status',
+                                    options: [
+                                        { value: '', label: 'All Status' },
+                                        { value: 'APPROVED', label: 'Approved' },
+                                        { value: 'PENDING', label: 'Pending' },
+                                        { value: 'REJECTED', label: 'Rejected' }
+                                    ]
+                                }
                             }}
                             columns={[
                                 { key: 'employee', label: 'Employee', render: (record) => `${record.employeeName}` },
@@ -639,7 +694,17 @@ const AdminReportPage = () => {
                             onExportPDF={() => exportToPDFUtil('task', getFilteredData('task'), globalDateFilter)}
                             onExportExcel={() => exportToExcel('task', getFilteredData('task'))}
                             filterConfig={{
-                                date: { type: 'date', placeholder: 'Filter by creation date' }
+                                date: { type: 'date', placeholder: 'Filter by creation date' },
+                                status: { 
+                                    type: 'select', 
+                                    label: 'Status',
+                                    options: [
+                                        { value: '', label: 'All Status' },
+                                        { value: 'COMPLETED', label: 'Completed' },
+                                        { value: 'PENDING', label: 'Pending' },
+                                        { value: 'IN_PROGRESS', label: 'In Progress' }
+                                    ]
+                                }
                             }}
                             columns={[
                                 { key: 'name', label: 'Name' },
@@ -703,6 +768,78 @@ const AdminReportPage = () => {
                     )}
                 </div>
             </div>
+
+            {/* Timesheet Detail Popup */}
+            {showTimesheetPopup && selectedTimesheet && (
+                <div className="fixed inset-0 bg-transparent backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                        <div className="p-6">
+                            <div className="flex items-center justify-between mb-6">
+                                <h3 className="text-xl font-semibold text-gray-900">Timesheet Details</h3>
+                                <button
+                                    onClick={closeTimesheetPopup}
+                                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Employee</label>
+                                        <p className="text-gray-900">{`${selectedTimesheet.fname} ${selectedTimesheet.lname}`}</p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                                        <p className="text-gray-900">{selectedTimesheet.date || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Work Hours</label>
+                                        <p className="text-gray-900">{selectedTimesheet.workHours || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                                        <p className="text-gray-900">{selectedTimesheet.startTime || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+                                        <p className="text-gray-900">{selectedTimesheet.endTime || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Lunch Out</label>
+                                        <p className="text-gray-900">{selectedTimesheet.lunchOutTime || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Lunch In</label>
+                                        <p className="text-gray-900">{selectedTimesheet.lunchInTime || 'N/A'}</p>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Work Summary</label>
+                                    <div className="bg-gray-50 p-3 rounded-md">
+                                        <p className="text-gray-900 whitespace-pre-wrap">
+                                            {selectedTimesheet.workSummery || selectedTimesheet.workSummary || selectedTimesheet.work_summary || selectedTimesheet.description || 'No work summary available'}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="mt-6 flex justify-end">
+                                <button
+                                    onClick={closeTimesheetPopup}
+                                    className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

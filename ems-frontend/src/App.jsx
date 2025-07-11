@@ -9,19 +9,20 @@ import Attendance from "./pages/admin/Attendance.jsx";
 import Leave from "./pages/admin/Leave.jsx";
 import Timesheet from "./pages/admin/Timesheet.jsx";
 import AdminReportPage from "./pages/admin/AdminReportPage.jsx";
-import Login from "./pages/login/Login.jsx";
+import Login from "./pages/auth/Login.jsx";
 import Onboarding from "./pages/admin/onboarding/Onboarding.jsx";
 import AdminSettings from "./pages/admin/Settings.jsx";
 import Files from "./pages/admin/onboarding/Files.jsx";
 import TaskPage from "./pages/admin/tasks/TaskPage.jsx";
 import EmpTask from "./pages/employee/tasks/EmpTask.jsx";
-import UploadPage from "./pages/candidate/UploadPage.jsx";
 import EmpHome from "./pages/employee/EmpHome.jsx";
 import EmpAttendance from "./pages/employee/EmpAttendance.jsx";
 import EmpLeave from "./pages/employee/EmpLeave.jsx";
 import EmpTimesheet from "./pages/employee/EmpTimesheet.jsx";
 import EmpReport from "./pages/employee/EmpReport.jsx";
 import Settings from "./pages/employee/Settings.jsx";
+import SignUp from './pages/auth/SignUp.jsx';
+import Email from './pages/admin/Email.jsx';
 
 function App() {
     const router = createBrowserRouter([
@@ -29,6 +30,11 @@ function App() {
         {
             path: "/",
             element: <Login />,
+        },
+        // Sign Up route
+        {
+            path: "/signup",
+            element: <SignUp />,
         },
         // Admin routes
         {
@@ -41,6 +47,7 @@ function App() {
                 { path: "attendance", element: <Attendance /> },
                 { path: "leave", element: <Leave /> },
                 { path: "timesheet", element: <Timesheet /> },
+                { path: "email", element: <Email /> },
                 { path: "reports", element: <AdminReportPage /> },
                 { path: "onboarding", element: <Onboarding /> },
                 { path: "onboarding-files", element: <Files /> },
@@ -63,11 +70,6 @@ function App() {
                 { path: "settings", element: <Settings /> },
             ],
         },
-        // Candidate document upload route
-        {
-            path: "/candidate/upload",
-            element: <UploadPage />,
-        }
     ]);
 
     return (
